@@ -1,0 +1,192 @@
+.brand-comp-page {
+    background: var(--gray-50);
+    padding-bottom: 80px;
+}
+
+.bc-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.bc-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.bc-salt {
+    font-size: var(--text-xs);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.bc-legend {
+    display: flex;
+    gap: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.bc-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    color: var(--gray-500);
+}
+
+.bc-list {
+    padding: var(--sp-3) var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+}
+
+.bc-card {
+    cursor: pointer;
+}
+
+.bc-cheapest {
+    border: 1.5px solid var(--primary-200);
+    background: var(--primary-50);
+}
+
+.bc-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--sp-4);
+}
+
+.bc-card-left {
+    display: flex;
+    gap: var(--sp-3);
+}
+
+.bc-card-img {
+    width: 40px;
+    height: 40px;
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.bc-card-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.bc-card-mfr {
+    font-size: 11px;
+    color: var(--gray-400);
+}
+
+.bc-card-pack {
+    font-size: 10px;
+    color: var(--gray-400);
+}
+
+.bc-card-price-col {
+    text-align: right;
+}
+
+.bc-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: var(--radius-full);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.bc-tag.cheapest {
+    background: #FEF3C7;
+    color: #D97706;
+}
+
+.bc-tag.closest {
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.bc-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-3) var(--sp-4);
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+}
+
+.bc-card-pharmacy {
+    font-size: 11px;
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bc-unavailable {
+    justify-content: center;
+    font-size: var(--text-xs);
+    color: var(--gray-400);
+}
+
+@media (min-width: 768px) {
+    .brand-comp-page {
+        padding-top: var(--header-height);
+        max-width: 800px;
+        margin: var(--sp-6) auto var(--sp-8);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-xl);
+        background: var(--white);
+        box-shadow: var(--shadow-sm);
+        padding-bottom: var(--sp-6);
+    }
+
+    .bc-header {
+        position: static;
+        padding: var(--sp-6);
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        background: transparent;
+        border-bottom: none;
+    }
+
+    .bc-legend {
+        position: static;
+        padding: 0 var(--sp-6) var(--sp-4);
+    }
+
+    .bc-list {
+        padding: 0 var(--sp-6);
+    }
+
+    .bc-card {
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        margin-bottom: 0;
+    }
+
+    .bc-cheapest {
+        border-color: var(--primary-200);
+    }
+}

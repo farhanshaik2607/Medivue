@@ -1,0 +1,172 @@
+.pharmacy-page {
+    background: var(--white);
+    padding-bottom: 80px;
+}
+
+.pp-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.pp-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.pp-hero {
+    padding: var(--sp-5) var(--sp-4);
+    text-align: center;
+}
+
+.pp-icon {
+    font-size: 48px;
+    margin-bottom: var(--sp-2);
+}
+
+.pp-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.pp-address {
+    font-size: var(--text-sm);
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: var(--sp-3);
+}
+
+.pp-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-2);
+    flex-wrap: wrap;
+}
+
+.pp-hours,
+.pp-dist {
+    font-size: var(--text-xs);
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.pp-rating-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+}
+
+.pp-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-3);
+    padding: 0 var(--sp-4) var(--sp-4);
+    flex-wrap: wrap;
+}
+
+.pp-delivery-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-sm);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.pp-medicines {
+    padding: 0 var(--sp-4);
+}
+
+.pp-med-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.pp-med-info {
+    display: flex;
+    gap: var(--sp-3);
+    cursor: pointer;
+    flex: 1;
+}
+
+.pp-med-emoji {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pp-med-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+.pp-med-salt {
+    font-size: 10px;
+    color: var(--gray-400);
+}
+
+.pp-med-pack {
+    font-size: 10px;
+    color: var(--gray-400);
+}
+
+.pp-med-action {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    flex-shrink: 0;
+}
+
+.pp-reviews {
+    padding: 0 var(--sp-4) var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+}
+
+.pp-review-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.pp-reviewer {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.pp-review-text {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: 4px;
+}

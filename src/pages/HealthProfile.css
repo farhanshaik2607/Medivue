@@ -1,0 +1,338 @@
+.hp-page {
+    background: var(--gray-50);
+}
+
+.hp-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    text-align: center;
+    padding: var(--sp-8) var(--sp-4) var(--sp-6);
+}
+
+.hp-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    font-family: var(--font-heading);
+    margin: 0 auto var(--sp-3);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.hp-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+}
+
+.hp-phone {
+    font-size: var(--text-sm);
+    opacity: 0.8;
+    margin-bottom: 2px;
+}
+
+.hp-email {
+    font-size: var(--text-xs);
+    opacity: 0.6;
+}
+
+.hp-menu {
+    padding: var(--sp-3) var(--sp-4);
+}
+
+.hp-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--sp-2);
+    width: 100%;
+    text-align: left;
+    transition: all 0.15s;
+}
+
+.hp-menu-item:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.hp-menu-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.hp-menu-label {
+    flex: 1;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.hp-menu-right {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.hp-menu-count {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.hp-logout {
+    margin-top: var(--sp-4);
+}
+
+.hp-section {
+    padding: var(--sp-4);
+}
+
+.hp-back-btn {
+    font-size: var(--text-sm);
+    color: var(--primary);
+    font-weight: 500;
+    margin-bottom: var(--sp-3);
+}
+
+.hp-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--sp-4);
+}
+
+.hp-family-list,
+.hp-docs-list,
+.hp-addr-list,
+.hp-saved-list,
+.hp-reminder-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+}
+
+.hp-family-card,
+.hp-doc-card,
+.hp-addr-card,
+.hp-reminder-card {
+    background: var(--white);
+}
+
+.hp-fm-top {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-2);
+}
+
+.hp-fm-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.hp-fm-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.hp-fm-meta {
+    font-size: 11px;
+    color: var(--gray-500);
+}
+
+.hp-fm-allergies,
+.hp-fm-chronic {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray-600);
+    margin-top: 4px;
+}
+
+.hp-doc-card {
+    display: flex !important;
+    align-items: center;
+    gap: var(--sp-3);
+}
+
+.hp-doc-icon {
+    font-size: 24px;
+}
+
+.hp-doc-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--gray-800);
+    display: block;
+}
+
+.hp-doc-meta {
+    font-size: 11px;
+    color: var(--gray-400);
+}
+
+.hp-addr-top {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: 4px;
+}
+
+.hp-addr-text {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+@media (min-width: 768px) {
+    .hp-page {
+        padding-top: var(--header-height);
+        padding-bottom: var(--sp-8);
+        background: var(--gray-50);
+    }
+
+    .desktop-layout {
+        padding: var(--sp-6) !important;
+        gap: var(--sp-8);
+        align-items: stretch;
+        background: transparent !important;
+    }
+
+    .hp-sidebar {
+        width: 340px;
+    }
+
+    .hp-hero {
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--sp-4);
+    }
+
+    .hp-menu {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+    }
+
+    .hp-menu-item.active {
+        background: var(--primary-50);
+        border-right: 3px solid var(--primary);
+    }
+
+    .hp-main {
+        flex: 1;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        padding: var(--sp-6);
+        min-height: 100%;
+    }
+
+    .hp-section {
+        padding: 0;
+    }
+
+    .hp-section-title {
+        font-size: var(--text-lg);
+        margin-bottom: var(--sp-6);
+        padding-bottom: var(--sp-4);
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .hp-family-list,
+    .hp-addr-list,
+    .hp-docs-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--sp-4);
+    }
+
+    .hp-family-list .btn-block,
+    .hp-docs-list .btn-block {
+        grid-column: 1 / -1;
+    }
+}
+
+.hp-saved-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.hp-saved-emoji {
+    font-size: 20px;
+}
+
+.hp-saved-info {
+    flex: 1;
+}
+
+.hp-saved-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--gray-800);
+    display: block;
+}
+
+.hp-saved-salt {
+    font-size: 11px;
+    color: var(--gray-400);
+}
+
+.hp-rem-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.hp-rem-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.hp-rem-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-bottom: 2px;
+}
+
+.hp-rem-member {
+    font-size: 11px;
+    color: var(--gray-400);
+}
