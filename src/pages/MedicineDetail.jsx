@@ -1,25 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Shield, AlertTriangle, MapPin, Star, Clock, Truck, ShoppingBag, ChevronRight, Info, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, Heart, Share2, Shield, AlertTriangle, MapPin, Star, Clock, Truck, ShoppingBag, ChevronRight, Info, BadgeCheck, Zap, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { medicines } from '../data/medicines';
 import { pharmacies } from '../data/pharmacies';
+import PharmacyMap from '../components/Map/PharmacyMap';
 import './MedicineDetail.css';
 
 export default function MedicineDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { state, dispatch, addToCart, getPharmaciesWithMedicine } = useApp();
+    const { state, dispatch, addToCart, getPharmaciesWithMedicine, getNearbyPharmacies } = useApp();
     const med = medicines.find(m => m.id === parseInt(id));
     const [tab, setTab] = useState('info');
     const [mode, setMode] = useState('delivery');
+    const [isSignaling, setIsSignaling] = useState(false);
+    const [isSignaled, setIsSignaled] = useState(false);
 
     if (!med) return <div className="page"><div className="empty-state"><h3>Medicine not found</h3></div></div>;
 
     const isSaved = state.user.savedMedicines.includes(med.id);
     const availablePharmacies = getPharmaciesWithMedicine(med.id);
+    const nearbyPharmacies = getNearbyPharmacies();
     const substitutes = med.substitutes.map(sid => medicines.find(m => m.id === sid)).filter(Boolean);
     const cheapest = availablePharmacies[0];
+
+    const handleSignalStores = () => {
+        setIsSignaling(true);
+        setTimeout(() => {
+            setIsSignaling(false);
+            setIsSignaled(true);
+        }, 1500);
+    };
 
     return (
         <div className="page-plain med-detail-page">
@@ -53,6 +65,50 @@ export default function MedicineDetail() {
                                 <span className="md-reviews">{med.reviews.toLocaleString()} ratings</span>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="divider mobile-only" />
+
+                    {/* Live Availability Map */}
+                    <div className="divider mobile-only" />
+                    <div className="md-map-section">
+                        <div className="section-header" style={{ marginBottom: 'var(--sp-4)' }}>
+                            <h2>Live Availability Map</h2>
+                            <span className="text-sm" style={{ color: 'var(--primary)', fontWeight: 600 }}>
+                                {availablePharmacies.length > 0 ? `${availablePharmacies.length} stores in stock` : 'Out of stock nearby'}
+                            </span>
+                        </div>
+
+                        <PharmacyMap pharmacies={nearbyPharmacies} userLocation={state.location} medId={med.id} />
+
+                        {availablePharmacies.length === 0 && (
+                            <div className="md-out-of-stock-action card card-body" style={{ marginTop: 'var(--sp-4)' }}>
+                                <div className="md-oos-content">
+                                    <AlertTriangle size={24} color="var(--warning)" className="mb-2" />
+                                    <h3>Currently unavailable nearby</h3>
+                                    <p className="text-sm text-gray" style={{ marginBottom: 'var(--sp-4)' }}>We can alert nearby pharmacies about your requirement so they can procure it.</p>
+
+                                    {isSignaled ? (
+                                        <div className="signal-success glass-panel animate-fade-in">
+                                            <CheckCircle2 color="var(--success)" size={20} />
+                                            <span>Signal broadcasted! Pharmacies will update their stock soon.</span>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            className={`btn btn-primary btn-block btn-lg signal-btn ${isSignaling ? 'loading' : ''}`}
+                                            onClick={handleSignalStores}
+                                            disabled={isSignaling}
+                                        >
+                                            {isSignaling ? (
+                                                <span className="loader-dots"></span>
+                                            ) : (
+                                                <><Zap size={18} /> Signal Nearby Stores</>
+                                            )}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="divider mobile-only" />

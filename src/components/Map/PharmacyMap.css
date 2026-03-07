@@ -1,0 +1,240 @@
+.pharmacy-map-container {
+    height: 300px;
+    width: 100%;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-100);
+    position: relative;
+    z-index: 1;
+    /* Keep leaflet controls below sticky headers */
+}
+
+.leaflet-map {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
+/* User Marker */
+.map-custom-div-icon {
+    background: transparent;
+    border: none;
+}
+
+.map-user-marker {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-user-core {
+    width: 12px;
+    height: 12px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.map-user-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* Pharmacy Marker */
+.map-pharma-marker {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.map-pharma-marker:hover {
+    transform: scale(1.1) translateY(-4px);
+}
+
+.map-pharma-marker svg {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.map-pharma-marker.in-stock {
+    color: var(--success);
+    border: 2px solid var(--success-100);
+}
+
+.map-pharma-marker.out-stock {
+    color: var(--gray-400);
+    border: 2px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+/* Glassmorphism Popup */
+.glass-popup .leaflet-popup-content-wrapper {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+    padding: 0;
+    overflow: hidden;
+}
+
+.glass-popup .leaflet-popup-tip {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.glass-popup .leaflet-popup-content {
+    margin: 0;
+    min-width: 220px;
+}
+
+/* Popup Content */
+.popup-content {
+    padding: var(--sp-4);
+}
+
+.popup-content strong {
+    display: block;
+    color: var(--gray-900);
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    margin-bottom: 2px;
+}
+
+.popup-content p {
+    color: var(--gray-500);
+    font-size: var(--text-xs);
+    margin: 0;
+}
+
+.popup-pharmacy {
+    padding: var(--sp-4);
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.popup-header h4 {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+    flex: 1;
+    padding-right: var(--sp-2);
+}
+
+.popup-dist-badge {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.popup-address {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin: 0 0 var(--sp-3) 0 !important;
+    line-height: 1.4;
+}
+
+.popup-stock {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--gray-100);
+}
+
+.popup-stock.in-stock .popup-price {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.popup-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+}
+
+.stock-qty {
+    color: var(--success);
+    font-weight: 600;
+    background: var(--success-50);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.walk-time {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--gray-500);
+}
+
+.out-of-stock-msg {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--error);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    background: var(--error-50);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-md);
+}
+
+/* Map Placeholder */
+.map-placeholder {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-2xl);
+    background: var(--gray-50);
+    color: var(--gray-500);
+    font-weight: 500;
+}

@@ -415,3 +415,109 @@
         display: block;
     }
 }
+
+/* Realtime Map & Signal Styles added */
+.md-map-section {
+    padding: var(--sp-4);
+}
+
+.md-map-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.md-out-of-stock-action {
+    background: linear-gradient(to bottom right, #ffffff, #FEF2F2);
+    border: 1px solid var(--error-100);
+    text-align: center;
+}
+
+.md-oos-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.md-oos-content h3 {
+    font-size: var(--text-base);
+    font-family: var(--font-heading);
+    color: var(--gray-900);
+    margin: 8px 0 4px;
+}
+
+.md-oos-content .text-gray {
+    color: var(--gray-500);
+    max-width: 80%;
+}
+
+.signal-btn {
+    background: linear-gradient(135deg, var(--warning), #F59E0B);
+    border: none;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.signal-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.signal-success {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--success-50);
+    border: 1px solid var(--success-200);
+    border-radius: var(--radius-lg);
+    color: var(--success-700);
+    font-weight: 600;
+    width: 100%;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+/* Loader Animation for Button */
+.loader-dots {
+    display: inline-block;
+    position: relative;
+    width: 60px;
+    height: 12px;
+}
+
+.loader-dots::after,
+.loader-dots::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    animation: loader-dots-anim 1s linear infinite;
+}
+
+.loader-dots::before {
+    left: 20px;
+    animation-delay: -0.5s;
+}
+
+.loader-dots::after {
+    left: 35px;
+    animation-delay: 0s;
+}
+
+@keyframes loader-dots-anim {
+
+    0%,
+    100% {
+        transform: scale(0.5);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
