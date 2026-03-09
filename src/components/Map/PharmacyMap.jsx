@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { MapPin, Navigation, Clock, AlertTriangle } from 'lucide-react';
+import { MapPin, Navigation, Clock, AlertTriangle, ExternalLink, ShoppingBag } from 'lucide-react';
+import { simulateStock } from '../../services/pharmacyService';
 import 'leaflet/dist/leaflet.css';
 import './PharmacyMap.css';
 
@@ -50,7 +51,21 @@ function ChangeView({ center, zoom }) {
     return null;
 }
 
-export default function PharmacyMap({ pharmacies, userLocation, medId }) {
+/**
+ * Get stock info for a pharmacy+medicine combination.
+ * Supports both static pharmacies (with stock object) and real pharmacies (simulated stock).
+ */
+function getStockInfo(pharmacy, medId, medicineMrp = 100) {
+    // For local pharmacies with explicit stock data
+    if (pharmacy.source !== 'google' && pharmacy.stock && pharmacy.stock[medId]) {
+        return pharmacy.stock[medId];
+    }
+
+    // For Google Places pharmacies or local without specific stock, simulate
+    return simulateStock(pharmacy.id, medId, medicineMrp);
+}
+
+export default function PharmacyMap({ pharmacies, userLocation, medId, medicineMrp = 100 }) {
     if (!userLocation || !userLocation.lat || !userLocation.lng) {
         return <div className="map-placeholder glass-panel">Location not available</div>;
     }
@@ -78,7 +93,7 @@ export default function PharmacyMap({ pharmacies, userLocation, medId }) {
 
                 {/* Pharmacies */}
                 {pharmacies.map(pharmacy => {
-                    const stockInfo = pharmacy.stock[medId];
+                    const stockInfo = getStockInfo(pharmacy, medId, medicineMrp);
                     const inStock = stockInfo && stockInfo.inStock && stockInfo.qty > 0;
 
                     return (
@@ -97,6 +112,13 @@ export default function PharmacyMap({ pharmacies, userLocation, medId }) {
                                     </div>
                                     <p className="popup-address">{pharmacy.address}</p>
 
+                                    {/* Rating info for Google pharmacies */}
+                                    {pharmacy.rating > 0 && (
+                                        <div className="popup-rating" style={{ fontSize: '11px', color: '#666', marginBottom: '6px' }}>
+                                            ⭐ {pharmacy.rating} {pharmacy.reviews > 0 && `(${pharmacy.reviews} reviews)`}
+                                        </div>
+                                    )}
+
                                     {inStock ? (
                                         <div className="popup-stock in-stock">
                                             <div className="popup-price">
@@ -113,6 +135,24 @@ export default function PharmacyMap({ pharmacies, userLocation, medId }) {
                                                 <AlertTriangle size={12} /> Out of Stock
                                             </div>
                                         </div>
+                                    )}
+
+                                    {/* Get Directions link for Google pharmacies */}
+                                    {pharmacy.googleMapsUri && (
+                                        <a
+                                            href={pharmacy.googleMapsUri}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="popup-directions"
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: '4px',
+                                                marginTop: '8px', fontSize: '11px', color: '#1e40af',
+                                                textDecoration: 'none', fontWeight: 600
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <ExternalLink size={10} /> Get Directions
+                                        </a>
                                     )}
                                 </div>
                             </Popup>

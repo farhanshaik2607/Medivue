@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# System/Mingit
+mingit/
+mingit.zip
+

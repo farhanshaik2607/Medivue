@@ -9,7 +9,8 @@ export default function Splash() {
     const navigate = useNavigate();
     const [step, setStep] = useState('welcome'); // welcome | location | signup
     const [name, setName] = useState('');
-    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleDetectLocation = () => {
         dispatch({
@@ -119,11 +120,12 @@ export default function Splash() {
                         <input className="form-input" placeholder="Enter your name" value={name} onChange={e => setName(e.target.value)} id="signup-name" />
                     </div>
                     <div className="form-group">
-                        <label className="form-label">Phone Number</label>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <input className="form-input" style={{ width: '70px', flexShrink: 0 }} value="+91" readOnly />
-                            <input className="form-input" placeholder="Enter phone number" value={phone} onChange={e => setPhone(e.target.value)} id="signup-phone" type="tel" />
-                        </div>
+                        <label className="form-label">Email</label>
+                        <input className="form-input" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} id="signup-email" type="email" />
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Password</label>
+                        <input className="form-input" placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} id="signup-password" type="password" />
                     </div>
                     <button className="btn btn-primary btn-lg btn-block" onClick={handleGetStarted} style={{ marginTop: '8px' }}>
                         Continue to MediVue+
