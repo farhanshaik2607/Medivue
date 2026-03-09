@@ -6,7 +6,7 @@ import { medicines } from '../data/medicines';
 import './HealthProfile.css';
 
 export default function HealthProfile() {
-    const { state } = useApp();
+    const { state, handleLogout } = useApp();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview'); // On mobile this controls view. On desktop, overview just means no specific tab selected if we want, but let's default to family on desktop or just keep overview as empty state.
     const user = state.user;
@@ -59,7 +59,15 @@ export default function HealthProfile() {
                                 </div>
                             </button>
                         ))}
-                        <button className="hp-menu-item hp-logout">
+                        <button
+                            className="hp-menu-item hp-logout"
+                            onClick={async () => {
+                                if (handleLogout) {
+                                    await handleLogout();
+                                    navigate('/'); // This will trigger the splash screen since isLoggedIn becomes false
+                                }
+                            }}
+                        >
                             <div className="hp-menu-icon" style={{ background: '#FEF2F2', color: '#EF4444' }}><LogOut size={18} /></div>
                             <span className="hp-menu-label" style={{ color: '#EF4444' }}>Log Out</span>
                             <ChevronRight size={16} color="var(--gray-300)" className="mobile-only" />

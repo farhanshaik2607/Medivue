@@ -14,3 +14,6 @@ export const SEARCH_DEBOUNCE_MS = 300;
 
 // Default search radius for pharmacies (in meters)
 export const DEFAULT_PHARMACY_RADIUS_M = 5000;
+
+// Overpass API (OpenStreetMap) – free, no key required
+export const OVERPASS_API_URL = 'https://overpass-api.de/api/interpreter';

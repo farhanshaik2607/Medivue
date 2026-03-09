@@ -1,4 +1,6 @@
-import { createContext, useContext, useReducer, useCallback } from 'react';
+import { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../services/firebase';
 import { medicines } from '../data/medicines';
 import { pharmacies } from '../data/pharmacies';
 import { mockUser, orders as mockOrders } from '../data/users';
@@ -11,8 +13,8 @@ const initialState = {
     user: mockUser,
     isLoggedIn: false,
     theme: localStorage.getItem('theme') || 'light',
-    location: { lat: 12.9352, lng: 77.6245, address: 'Koramangala, Bangalore', set: false },
-    radius: 2,
+    location: { lat: 17.8484, lng: 78.6832, address: 'Gajwel, Siddipet District, Telangana', set: false },
+    radius: 5,
     searchHistory: ['Dolo 650', 'Paracetamol', 'Vitamin D'],
     cart: [],
     prescriptions: [],
@@ -34,6 +36,21 @@ function appReducer(state, action) {
     switch (action.type) {
         case 'SET_LOGGED_IN':
             return { ...state, isLoggedIn: true, showSplash: false };
+        case 'SET_USER':
+            return {
+                ...state,
+                user: action.payload ? { ...state.user, ...action.payload } : mockUser,
+                isLoggedIn: !!action.payload,
+                showSplash: action.payload ? false : state.showSplash
+            };
+        case 'LOGOUT':
+            return {
+                ...state,
+                user: mockUser,
+                isLoggedIn: false,
+                cart: [], // Clear cart on logout
+                showSplash: true
+            };
         case 'SET_LOCATION':
             return { ...state, location: { ...action.payload, set: true } };
         case 'SET_RADIUS':
@@ -98,6 +115,25 @@ export function AppProvider({ children }) {
     if (typeof document !== 'undefined') {
         document.documentElement.setAttribute('data-theme', state.theme);
     }
+
+    // Firebase Auth State Listener
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                dispatch({
+                    type: 'SET_USER',
+                    payload: {
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        name: currentUser.displayName || currentUser.email.split('@')[0]
+                    }
+                });
+            } else {
+                dispatch({ type: 'LOGOUT' });
+            }
+        });
+        return () => unsubscribe();
+    }, []);
 
     const addToCart = useCallback((medId, pharmacyId, name, price) => {
         dispatch({ type: 'ADD_TO_CART', payload: { medId, pharmacyId, name, price } });
@@ -235,7 +271,17 @@ export function AppProvider({ children }) {
         searchMedicinesAction, fetchMedicineDetail, fetchNearbyPharmaciesAction,
     };
 
-    return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+    // Global logout helper
+    const handleLogout = useCallback(async () => {
+        try {
+            await signOut(auth);
+            dispatch({ type: 'LOGOUT' });
+        } catch (error) {
+            console.error("Error signing out: ", error);
+        }
+    }, [dispatch]);
+
+    return <AppContext.Provider value={{ ...value, handleLogout }}>{children}</AppContext.Provider>;
 }
 
 export function useApp() {
