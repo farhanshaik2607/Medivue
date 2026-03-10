@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MapPin, Locate, ChevronRight, AlertCircle, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../services/firebase';
+import { createUserProfile, getUserProfile } from '../services/firestoreService';
 import './Splash.css';
 
 export default function Splash() {
-    const { dispatch } = useApp();
+    const { dispatch, markLoginHandled } = useApp();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const role = searchParams.get('role');
     const [step, setStep] = useState('welcome'); // welcome | location | auth
     const [isLogin, setIsLogin] = useState(false);
     const [name, setName] = useState('');
@@ -16,6 +19,16 @@ export default function Splash() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Helper: finish login and set all state at once
+    const finishLogin = (user, displayName) => {
+        dispatch({ type: 'SET_USER_ROLE', payload: 'user' });
+        dispatch({
+            type: 'SET_USER',
+            payload: { uid: user.uid, email: user.email, name: displayName || user.email.split('@')[0] }
+        });
+        dispatch({ type: 'SET_AUTH_LOADING', payload: false });
+    };
 
     const handleDetectLocation = () => {
         dispatch({
@@ -45,19 +58,32 @@ export default function Splash() {
         setLoading(true);
 
         try {
+            // Tell onAuthStateChanged to skip — we handle state ourselves
+            markLoginHandled();
+
             if (isLogin) {
-                await signInWithEmailAndPassword(auth, email, password);
+                const cred = await signInWithEmailAndPassword(auth, email, password);
+                const profile = await getUserProfile(cred.user.uid);
+                if (profile && profile.role === 'pharmacy') {
+                    setError('This account is a Pharmacy account. Please use Pharmacy login.');
+                    await auth.signOut();
+                    setLoading(false);
+                    return;
+                }
+                finishLogin(cred.user, cred.user.displayName || profile?.name);
             } else {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 if (name) {
                     await updateProfile(userCredential.user, { displayName: name });
                 }
+                await createUserProfile(userCredential.user.uid, {
+                    role: 'user', name: name, email: email,
+                });
+                finishLogin(userCredential.user, name);
             }
-            // The onAuthStateChanged listener in AppContext will catch the login and update global state
             navigate('/');
         } catch (err) {
             console.error(err);
-            // Clean up Firebase error messages for the user
             let message = err.message;
             if (err.code === 'auth/email-already-in-use') message = 'Email is already registered. Please log in.';
             else if (err.code === 'auth/invalid-credential') message = 'Invalid email or password.';
@@ -72,7 +98,25 @@ export default function Splash() {
         setError('');
         setLoading(true);
         try {
-            await signInWithPopup(auth, googleProvider);
+            // Tell onAuthStateChanged to skip
+            markLoginHandled();
+
+            const cred = await signInWithPopup(auth, googleProvider);
+            const profile = await getUserProfile(cred.user.uid);
+            if (profile && profile.role === 'pharmacy') {
+                setError('This Google account is a Pharmacy account. Please use Pharmacy login.');
+                await auth.signOut();
+                setLoading(false);
+                return;
+            }
+            if (!profile) {
+                await createUserProfile(cred.user.uid, {
+                    role: 'user',
+                    name: cred.user.displayName || cred.user.email.split('@')[0],
+                    email: cred.user.email,
+                });
+            }
+            finishLogin(cred.user, cred.user.displayName || profile?.name);
             navigate('/');
         } catch (err) {
             console.error(err);

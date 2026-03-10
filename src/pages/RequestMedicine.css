@@ -1,0 +1,124 @@
+.rm-page {
+    background: var(--white);
+}
+
+.rm-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.rm-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.rm-content {
+    padding: var(--sp-4);
+}
+
+.rm-info-banner {
+    display: flex;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    background: var(--primary-50);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--sp-5);
+}
+
+.rm-info-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.rm-info-banner p {
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    line-height: 1.5;
+}
+
+.rm-toggle-group {
+    display: flex;
+    gap: var(--sp-2);
+}
+
+.rm-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--gray-200);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-600);
+    transition: all 0.2s var(--ease);
+    background: var(--white);
+}
+
+.rm-toggle.active {
+    border-color: var(--primary);
+    background: var(--primary-50);
+    color: var(--primary);
+}
+
+.rm-toggle.urgent {
+    border-color: var(--danger);
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.rm-upload-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-5);
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rm-upload-area:hover {
+    border-color: var(--primary);
+    background: var(--primary-50);
+}
+
+.rm-upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--gray-400);
+    font-size: var(--text-sm);
+}
+
+.rm-upload-done {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+}
+
+.rm-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--sp-8);
+    text-align: center;
+    gap: var(--sp-3);
+}

@@ -1,6 +1,7 @@
-import { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
+import { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
+import { getUserProfile } from '../services/firestoreService';
 import { medicines } from '../data/medicines';
 import { pharmacies } from '../data/pharmacies';
 import { mockUser, orders as mockOrders } from '../data/users';
@@ -12,6 +13,8 @@ const AppContext = createContext();
 const initialState = {
     user: mockUser,
     isLoggedIn: false,
+    userRole: null, // 'user' | 'pharmacy' | null
+    authLoading: true, // true until Firebase auth + Firestore role lookup complete
     theme: localStorage.getItem('theme') || 'light',
     location: { lat: 17.8484, lng: 78.6832, address: 'Gajwel, Siddipet District, Telangana', set: false },
     radius: 5,
@@ -36,6 +39,10 @@ function appReducer(state, action) {
     switch (action.type) {
         case 'SET_LOGGED_IN':
             return { ...state, isLoggedIn: true, showSplash: false };
+        case 'SET_USER_ROLE':
+            return { ...state, userRole: action.payload };
+        case 'SET_AUTH_LOADING':
+            return { ...state, authLoading: action.payload };
         case 'SET_USER':
             return {
                 ...state,
@@ -48,6 +55,8 @@ function appReducer(state, action) {
                 ...state,
                 user: mockUser,
                 isLoggedIn: false,
+                userRole: null,
+                authLoading: false,
                 cart: [], // Clear cart on logout
                 showSplash: true
             };
@@ -112,24 +121,58 @@ function appReducer(state, action) {
 export function AppProvider({ children }) {
     const [state, dispatch] = useReducer(appReducer, initialState);
 
+    // Ref to coordinate between explicit login handlers and onAuthStateChanged
+    // When a login handler (PharmacyLogin or Splash) sets this to true before calling
+    // signIn, onAuthStateChanged will skip its own Firestore fetch and let the login
+    // handler manage all state transitions. This prevents the race condition.
+    const loginHandledRef = useRef(false);
+
+    const markLoginHandled = useCallback(() => {
+        loginHandledRef.current = true;
+    }, []);
+
     if (typeof document !== 'undefined') {
         document.documentElement.setAttribute('data-theme', state.theme);
     }
 
     // Firebase Auth State Listener
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
-                dispatch({
-                    type: 'SET_USER',
-                    payload: {
-                        uid: currentUser.uid,
-                        email: currentUser.email,
-                        name: currentUser.displayName || currentUser.email.split('@')[0]
-                    }
-                });
+                // If a login handler is already managing this auth change, skip
+                if (loginHandledRef.current) {
+                    loginHandledRef.current = false;
+                    return; // login handler will dispatch all state changes
+                }
+                // Normal flow: initial app load or page refresh
+                try {
+                    const profile = await getUserProfile(currentUser.uid);
+                    const role = profile?.role || 'user';
+                    dispatch({ type: 'SET_USER_ROLE', payload: role });
+                    dispatch({
+                        type: 'SET_USER',
+                        payload: {
+                            uid: currentUser.uid,
+                            email: currentUser.email,
+                            name: currentUser.displayName || profile?.name || currentUser.email.split('@')[0]
+                        }
+                    });
+                } catch (err) {
+                    console.error('Error fetching user profile:', err);
+                    dispatch({
+                        type: 'SET_USER',
+                        payload: {
+                            uid: currentUser.uid,
+                            email: currentUser.email,
+                            name: currentUser.displayName || currentUser.email.split('@')[0]
+                        }
+                    });
+                } finally {
+                    dispatch({ type: 'SET_AUTH_LOADING', payload: false });
+                }
             } else {
                 dispatch({ type: 'LOGOUT' });
+                dispatch({ type: 'SET_AUTH_LOADING', payload: false });
             }
         });
         return () => unsubscribe();
@@ -269,6 +312,8 @@ export function AppProvider({ children }) {
         getPharmacyById, getPharmaciesWithMedicine, fetchLocation,
         // New API-powered helpers
         searchMedicinesAction, fetchMedicineDetail, fetchNearbyPharmaciesAction,
+        // Auth coordination
+        markLoginHandled,
     };
 
     // Global logout helper

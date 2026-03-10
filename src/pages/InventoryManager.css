@@ -1,0 +1,249 @@
+.inv-page {
+    background: var(--gray-50);
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+.inv-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.inv-title {
+    flex: 1;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.inv-controls {
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.inv-search {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--gray-200);
+    margin-bottom: var(--sp-3);
+    color: var(--gray-400);
+}
+
+.inv-search input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: var(--text-sm);
+    color: var(--gray-800);
+    outline: none;
+}
+
+.inv-filters {
+    display: flex;
+    gap: var(--sp-2);
+}
+
+.inv-list {
+    padding: var(--sp-3) var(--sp-4);
+}
+
+.inv-card {
+    background: var(--white);
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-3);
+    margin-bottom: var(--sp-3);
+    border-left: 4px solid var(--gray-200);
+}
+
+.inv-ok {
+    border-left-color: #22C55E;
+}
+
+.inv-low {
+    border-left-color: #F59E0B;
+}
+
+.inv-expiring {
+    border-left-color: #EF4444;
+}
+
+.inv-card-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.inv-card-left {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: flex-start;
+}
+
+.inv-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.inv-ok .inv-status-dot {
+    background: #22C55E;
+}
+
+.inv-low .inv-status-dot {
+    background: #F59E0B;
+}
+
+.inv-expiring .inv-status-dot {
+    background: #EF4444;
+}
+
+.inv-card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.inv-card-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.inv-card-salt {
+    font-size: 11px;
+    color: var(--gray-500);
+}
+
+.inv-card-cat {
+    font-size: 10px;
+    color: var(--primary);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.inv-card-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.inv-card-price {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--gray-900);
+    font-size: var(--text-sm);
+}
+
+.inv-card-qty {
+    font-size: 11px;
+    color: var(--gray-500);
+}
+
+.inv-card-exp {
+    font-size: 10px;
+    color: var(--gray-400);
+}
+
+.inv-card-actions {
+    display: flex;
+    gap: var(--sp-2);
+    margin-top: var(--sp-2);
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--gray-50);
+}
+
+.inv-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.inv-action-btn.edit {
+    color: var(--primary);
+    background: var(--primary-50);
+}
+
+.inv-action-btn.edit:hover {
+    background: var(--primary-100);
+}
+
+.inv-action-btn.delete {
+    color: #DC2626;
+    background: #FEF2F2;
+}
+
+.inv-action-btn.delete:hover {
+    background: #FEE2E2;
+}
+
+/* Modal */
+.inv-modal {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--sp-4);
+    z-index: 200;
+}
+
+.inv-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-4);
+}
+
+.inv-modal-header h3 {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.inv-modal-header button {
+    color: var(--gray-500);
+}
+
+.inv-modal-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.inv-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3);
+}
+
+.inv-modal-form select.form-input {
+    appearance: auto;
+    color: var(--gray-800);
+    background: var(--white);
+}

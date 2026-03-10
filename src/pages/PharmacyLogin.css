@@ -1,0 +1,119 @@
+.pharmacy-login-page {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--sp-6);
+    position: relative;
+    overflow: hidden;
+}
+
+.pharmacy-login-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.pl-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.06;
+}
+
+.pl-circle.c1 {
+    width: 300px;
+    height: 300px;
+    background: var(--accent);
+    top: -80px;
+    left: -60px;
+    animation: roleFloat 7s ease-in-out infinite;
+}
+
+.pl-circle.c2 {
+    width: 220px;
+    height: 220px;
+    background: var(--primary);
+    bottom: -50px;
+    right: -40px;
+    animation: roleFloat 9s ease-in-out infinite reverse;
+}
+
+.pharmacy-login-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pl-back {
+    align-self: flex-start;
+    color: var(--gray-600);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--sp-4);
+    border-radius: var(--radius-md);
+    transition: background 0.2s;
+}
+
+.pl-back:hover {
+    background: var(--gray-100);
+}
+
+.pl-header {
+    text-align: center;
+    margin-bottom: var(--sp-4);
+}
+
+.pl-icon {
+    font-size: 48px;
+    margin-bottom: var(--sp-3);
+}
+
+.pl-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    margin-bottom: var(--sp-4);
+    width: 100%;
+}
+
+.pl-form {
+    width: 100%;
+}
+
+.pl-form .form-group {
+    position: relative;
+    z-index: 10;
+}
+
+/* Reuse splash-or from Splash.css */
+.pharmacy-login-page .splash-or {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    color: var(--gray-400);
+    font-size: var(--text-sm);
+}
+
+.pharmacy-login-page .splash-or::before,
+.pharmacy-login-page .splash-or::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+}

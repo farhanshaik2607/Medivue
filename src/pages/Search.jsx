@@ -385,8 +385,12 @@ export default function SearchPage() {
                             {!state.searchLoading && results.length === 0 && (
                                 <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
                                     <SearchIcon size={48} />
-                                    <h3>No medicines found</h3>
-                                    <p>Try a different search term, a generic name, or adjust filters</p>
+                                    <h3>Medicine not found nearby.</h3>
+                                    <p>Try a different search term, or request this medicine from nearby pharmacies.</p>
+                                    <button className="btn btn-primary" style={{ marginTop: '16px' }}
+                                        onClick={() => navigate(`/request-medicine?name=${encodeURIComponent(query)}`)}>
+                                        📡 Request Medicine
+                                    </button>
                                 </div>
                             )}
                         </div>

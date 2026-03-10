@@ -1,0 +1,165 @@
+.mr-page {
+    background: var(--white);
+}
+
+.mr-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.mr-content {
+    padding: var(--sp-4);
+    padding-bottom: 80px;
+}
+
+.mr-card {
+    background: var(--white);
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4);
+    margin-bottom: var(--sp-4);
+    box-shadow: var(--shadow-sm);
+}
+
+.mr-card-top {
+    margin-bottom: var(--sp-3);
+}
+
+.mr-med-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+}
+
+.mr-meta {
+    font-size: var(--text-xs);
+    color: var(--gray-500);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.mr-date {
+    font-size: var(--text-xs);
+    color: var(--gray-400);
+}
+
+/* Accepted banner */
+.mr-accepted {
+    display: flex;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    background: var(--primary-50);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--sp-4);
+    align-items: flex-start;
+}
+
+.mr-accepted-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--primary);
+    display: block;
+}
+
+.mr-accepted-detail {
+    font-size: var(--text-xs);
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+}
+
+/* Stepper */
+.mr-stepper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    padding: var(--sp-3) 0;
+}
+
+.mr-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.mr-step-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    color: var(--gray-400);
+    z-index: 2;
+    transition: all 0.3s;
+    border: 2px solid var(--gray-200);
+}
+
+.mr-step.done .mr-step-dot {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.mr-step.current .mr-step-dot {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(15, 132, 126, 0.2);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.mr-step-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--gray-400);
+    margin-top: 6px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.mr-step.done .mr-step-label {
+    color: var(--primary);
+}
+
+/* Connecting lines */
+.mr-step::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--gray-200);
+    z-index: 1;
+}
+
+.mr-step:first-child::before {
+    display: none;
+}
+
+.mr-step.done::before {
+    background: var(--primary);
+}
+
+/* Hide the internal line elements since we use ::before */
+.mr-step-line-before,
+.mr-step-line-after {
+    display: none;
+}

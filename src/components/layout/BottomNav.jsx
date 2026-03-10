@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingCart, ClipboardList, User } from 'lucide-react';
+import { Home, Search, ShoppingCart, ClipboardList, User, Send } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import './BottomNav.css';
 
@@ -12,7 +12,7 @@ export default function BottomNav() {
         { to: '/', icon: Home, label: 'Home' },
         { to: '/search', icon: Search, label: 'Search' },
         { to: '/cart', icon: ShoppingCart, label: 'Cart', badge: cartCount },
-        { to: '/orders', icon: ClipboardList, label: 'Orders' },
+        { to: '/my-requests', icon: Send, label: 'Requests' },
         { to: '/profile', icon: User, label: 'Profile' },
     ];
 
