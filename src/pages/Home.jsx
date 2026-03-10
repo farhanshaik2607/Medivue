@@ -88,8 +88,10 @@ export default function Home() {
             </div>
             <div className="scroll-row categories-row">
                 {categories.map(cat => (
-                    <div key={cat.id} className="category-chip" onClick={() => navigate(`/search?category=${cat.id}`)}>
-                        <span className="category-icon" style={{ background: cat.color + '15', color: cat.color }}>{cat.icon}</span>
+                    <div key={cat.id} className="category-card" onClick={() => navigate(`/search?category=${cat.id}`)}>
+                        <div className="category-img-wrap">
+                            <img src={cat.image} alt={cat.name} className="category-img" />
+                        </div>
                         <span className="category-name">{cat.name}</span>
                     </div>
                 ))}

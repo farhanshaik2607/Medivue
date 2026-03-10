@@ -675,6 +675,7 @@ ol {
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
   color: var(--gray-800);
+  background: var(--white);
   outline: none;
   transition: all 0.2s var(--ease);
 }

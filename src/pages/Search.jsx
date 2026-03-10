@@ -12,7 +12,7 @@ export default function SearchPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [query, setQuery] = useState(searchParams.get('q') || '');
-    const [showResults, setShowResults] = useState(!!searchParams.get('q'));
+    const [showResults, setShowResults] = useState(!!searchParams.get('q') || !!searchParams.get('category'));
     const [filterOpen, setFilterOpen] = useState(false);
     const [filters, setFilters] = useState({ sort: 'relevance', priceMax: 500, onlyAvailable: true, onlyOTC: false });
     const inputRef = useRef(null);
@@ -24,10 +24,12 @@ export default function SearchPage() {
     }, [showResults]);
 
     useEffect(() => {
-        if (searchParams.get('q')) {
-            setQuery(searchParams.get('q'));
+        if (searchParams.get('q') || searchParams.get('category')) {
+            if (searchParams.get('q')) {
+                setQuery(searchParams.get('q'));
+                searchMedicinesAction(searchParams.get('q'));
+            }
             setShowResults(true);
-            searchMedicinesAction(searchParams.get('q'));
         }
     }, [searchParams, searchMedicinesAction]);
 
@@ -85,9 +87,11 @@ export default function SearchPage() {
 
         // Apply category filter
         if (selectedCategory) {
-            resultSet = resultSet.filter(m => {
-                return m.category.toLowerCase().replace(/\s+&\s+/g, '').replace(/\s+/g, '').includes(selectedCategory.toLowerCase());
-            });
+            // Find the full category name from the id (e.g. 'pain' -> 'Pain Relief')
+            const catInfo = categories.find(c => c.id === selectedCategory);
+            if (catInfo) {
+                resultSet = resultSet.filter(m => m.category === catInfo.name);
+            }
         }
 
         // Apply price filter
@@ -264,7 +268,9 @@ export default function SearchPage() {
                         <div className="search-categories-grid">
                             {categories.map(cat => (
                                 <div key={cat.id} className="search-cat-card" onClick={() => { navigate(`/search?category=${cat.id}`); setShowResults(true); }}>
-                                    <span className="search-cat-icon" style={{ background: cat.color + '15' }}>{cat.icon}</span>
+                                    <div className="search-cat-img-wrap">
+                                        <img src={cat.image} alt={cat.name} className="search-cat-img" />
+                                    </div>
                                     <span className="search-cat-name">{cat.name}</span>
                                 </div>
                             ))}

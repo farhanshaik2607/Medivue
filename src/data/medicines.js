@@ -32,16 +32,16 @@ export const medicines = [
 ];
 
 export const categories = [
-  { id: 'pain', name: 'Pain Relief', icon: '🩹', color: '#EF4444' },
-  { id: 'antibiotics', name: 'Antibiotics', icon: '💊', color: '#3B82F6' },
-  { id: 'gastro', name: 'Stomach', icon: '🫁', color: '#F59E0B' },
-  { id: 'allergy', name: 'Allergy', icon: '🤧', color: '#8B5CF6' },
-  { id: 'diabetes', name: 'Diabetes', icon: '🩸', color: '#EC4899' },
-  { id: 'vitamins', name: 'Vitamins', icon: '🧬', color: '#22C55E' },
-  { id: 'heart', name: 'Heart & BP', icon: '❤️', color: '#EF4444' },
-  { id: 'skin', name: 'Skin Care', icon: '🧴', color: '#06B6D4' },
-  { id: 'thyroid', name: 'Thyroid', icon: '🦋', color: '#6366F1' },
-  { id: 'personal', name: 'Personal Care', icon: '🧼', color: '#14B8A6' },
+  { id: 'pain', name: 'Pain Relief', image: '/images/categories/pain.png' },
+  { id: 'antibiotics', name: 'Antibiotics', image: '/images/categories/antibiotics.png' },
+  { id: 'gastro', name: 'Stomach', image: '/images/categories/stomach.png' },
+  { id: 'allergy', name: 'Allergy', image: '/images/categories/allergy.png' },
+  { id: 'diabetes', name: 'Diabetes', image: '/images/categories/diabetes.png' },
+  { id: 'vitamins', name: 'Vitamins', image: '/images/categories/vitamins.png' },
+  { id: 'heart', name: 'Heart & BP', image: '/images/categories/heart.png' },
+  { id: 'skin', name: 'Skin Care', image: '/images/categories/skin.png' },
+  { id: 'thyroid', name: 'Thyroid', image: '/images/categories/thyroid.png' },
+  { id: 'personal', name: 'Personal Care', image: '/images/categories/personal.png' },
 ];
 
 export const popularSearches = ['Dolo 650', 'Paracetamol', 'Azithromycin', 'Combiflam', 'Pan 40', 'Vitamin D', 'Cetirizine', 'Metformin'];

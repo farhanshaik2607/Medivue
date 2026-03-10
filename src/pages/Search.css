@@ -44,6 +44,7 @@
     border: 1.5px solid var(--gray-200);
     border-radius: var(--radius-full);
     font-size: var(--text-sm);
+    color: var(--gray-800);
     outline: none;
     background: var(--gray-50);
     transition: all 0.2s var(--ease);
@@ -159,8 +160,13 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .result-tags {
@@ -219,24 +225,44 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     cursor: pointer;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 8px;
+    transition: all 0.2s var(--ease);
 }
 
-.search-cat-icon {
-    width: 48px;
-    height: 48px;
+.search-cat-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.search-cat-img-wrap {
+    width: 60px;
+    height: 60px;
     border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
+    overflow: hidden;
+    background: var(--gray-50);
+}
+
+.search-cat-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s var(--ease);
+}
+
+.search-cat-card:hover .search-cat-img {
+    transform: scale(1.05);
 }
 
 .search-cat-name {
     font-size: 10px;
-    font-weight: 500;
-    color: var(--gray-600);
+    font-weight: 600;
+    color: var(--gray-800);
     text-align: center;
 }
 

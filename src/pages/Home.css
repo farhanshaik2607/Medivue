@@ -177,34 +177,49 @@
     gap: var(--sp-3) !important;
 }
 
-.category-chip {
+.category-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
     cursor: pointer;
-    min-width: 72px;
-}
-
-.category-icon {
-    width: 52px;
-    height: 52px;
+    min-width: 110px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    transition: transform 0.2s var(--ease);
+    padding: 10px;
+    transition: all 0.2s var(--ease);
 }
 
-.category-chip:hover .category-icon {
-    transform: scale(1.1);
+.category-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.category-img-wrap {
+    width: 90px;
+    height: 90px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--gray-50);
+}
+
+.category-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s var(--ease);
+}
+
+.category-card:hover .category-img {
+    transform: scale(1.05);
 }
 
 .category-name {
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--gray-600);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-800);
     text-align: center;
     white-space: nowrap;
 }
