@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, CreditCard, Smartphone, Banknote, Wallet, Check, ChevronRight, Shield } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Smartphone, Banknote, Wallet, Check, ChevronRight, Shield, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { createOrder } from '../services/firestoreService';
 import './Checkout.css';
 
 export default function Checkout() {
@@ -15,12 +16,61 @@ export default function Checkout() {
     const deliveryFee = cartTotal >= 299 ? 0 : 30;
     const grandTotal = cartTotal + deliveryFee;
 
-    const handlePlaceOrder = () => {
-        setOrderPlaced(true);
-        setTimeout(() => {
-            dispatch({ type: 'CLEAR_CART' });
-            navigate('/order-tracking');
-        }, 2000);
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handlePlaceOrder = async () => {
+        if (!state.user?.uid || state.cart.length === 0) return;
+        setIsProcessing(true);
+
+        // Group cart items by pharmacy
+        const grouped = state.cart.reduce((acc, item) => {
+            if (!acc[item.pharmacyId]) acc[item.pharmacyId] = [];
+            acc[item.pharmacyId].push(item);
+            return acc;
+        }, {});
+
+        try {
+            // Create an order doc for each pharmacy
+            for (const [phId, items] of Object.entries(grouped)) {
+                const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+                const isDelivery = state.deliveryMode === 'delivery';
+                // Find pharmacy to check free delivery threshold if needed
+                const phData = state.registeredPharmacies?.find(p => String(p.id) === String(phId));
+                let fee = 0;
+                if (isDelivery && phData) {
+                    fee = subtotal >= (phData.freeDeliveryAbove || 299) ? 0 : (phData.deliveryFee || 30);
+                } else if (isDelivery) {
+                    fee = subtotal >= 299 ? 0 : 30; // fallback
+                }
+
+                await createOrder({
+                    userId: state.user.uid,
+                    userName: state.user.displayName || 'Customer',
+                    userPhone: state.user.phoneNumber || null,
+                    pharmacyId: phId,
+                    pharmacyName: phData?.name || 'Pharmacy',
+                    items: items,
+                    subtotal: subtotal,
+                    deliveryFee: fee,
+                    total: subtotal + fee,
+                    paymentMethod: paymentMethod,
+                    deliveryMode: state.deliveryMode,
+                    deliveryAddress: isDelivery ? (state.selectedAddress || null) : null,
+                });
+            }
+
+            setOrderPlaced(true);
+            setTimeout(() => {
+                dispatch({ type: 'CLEAR_CART' });
+                navigate('/order-tracking');
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Error placing order:', error);
+            alert('Failed to place order. Please try again.');
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     if (orderPlaced) {
@@ -112,8 +162,8 @@ export default function Checkout() {
 
                     {/* Desktop Place Order */}
                     <div className="desktop-only card card-body" style={{ marginTop: 'var(--sp-4)', border: '1px solid var(--gray-200)' }}>
-                        <button className="btn btn-primary btn-block btn-lg" onClick={handlePlaceOrder}>
-                            Pay ₹{grandTotal}
+                        <button className={`btn btn-primary btn-block btn-lg ${isProcessing ? 'loading' : ''}`} onClick={handlePlaceOrder} disabled={isProcessing}>
+                            {isProcessing ? <Loader2 size={20} className="spin" /> : `Pay ₹${grandTotal}`}
                         </button>
                     </div>
                 </div>
@@ -125,8 +175,8 @@ export default function Checkout() {
                     <span className="price" style={{ fontSize: '18px' }}>₹{grandTotal}</span>
                     <span className="text-xs">Total Amount</span>
                 </div>
-                <button className="btn btn-primary btn-lg" onClick={handlePlaceOrder}>
-                    Place Order
+                <button className={`btn btn-primary btn-lg ${isProcessing ? 'loading' : ''}`} onClick={handlePlaceOrder} disabled={isProcessing}>
+                    {isProcessing ? <Loader2 size={20} className="spin" /> : 'Place Order'}
                 </button>
             </div>
         </div>

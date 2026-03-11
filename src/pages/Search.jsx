@@ -3,12 +3,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search as SearchIcon, Mic, ArrowLeft, X, Clock, TrendingUp, Filter, MapPin, Star, ChevronDown, Loader, Database, Shield } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { medicines, categories, popularSearches } from '../data/medicines';
-import { pharmacies } from '../data/pharmacies';
 import { SEARCH_DEBOUNCE_MS } from '../services/config';
 import './Search.css';
 
 export default function SearchPage() {
-    const { state, dispatch, getPharmaciesWithMedicine, searchMedicinesAction } = useApp();
+    const { state, dispatch, getPharmaciesWithMedicine, searchMedicinesAction, getNearbyPharmacies } = useApp();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [query, setQuery] = useState(searchParams.get('q') || '');
@@ -136,8 +135,22 @@ export default function SearchPage() {
         debouncedSearch(val);
     };
 
-    const checkNearby = (medId) => {
-        return pharmacies.some(p => p.stock[medId]?.inStock && p.distance <= state.radius);
+    const checkNearby = (medId, medName) => {
+        // Check if any registered pharmacy has this medicine
+        const nearby = getNearbyPharmacies();
+        const searchName = (medName || '').toLowerCase().trim();
+        return nearby.some(p => p.inventory && p.inventory.some(item => {
+            const itemName = (item.name || '').toLowerCase().trim();
+            // Direct name match
+            if (searchName && (itemName.includes(searchName) || searchName.includes(itemName))) return true;
+            // Fallback: match by local medicine data
+            const med = medicines.find(m => m.id === medId);
+            if (med) {
+                const localName = med.name.toLowerCase();
+                return itemName.includes(localName) || localName.includes(itemName);
+            }
+            return false;
+        }));
     };
 
     const getMedicineUrl = (med) => {
@@ -325,12 +338,9 @@ export default function SearchPage() {
                     <div className="desktop-main">
                         <div className="results-list">
                             {results.map(med => {
-                                const nearby = med.source === 'local' ? checkNearby(med.id) : false;
-                                const cheapestPharmacy = med.source === 'local'
-                                    ? pharmacies
-                                        .filter(p => p.stock[med.id]?.inStock && p.distance <= state.radius)
-                                        .sort((a, b) => a.stock[med.id].price - b.stock[med.id].price)[0]
-                                    : null;
+                                const nearby = med.source === 'local' ? checkNearby(med.id, med.name) : checkNearby(med.id, med.name);
+                                const availPharmacies = getPharmaciesWithMedicine(med.id, med.mrp, med.name);
+                                const cheapestPharmacy = availPharmacies.length > 0 ? availPharmacies[0] : null;
 
                                 return (
                                     <div key={med.id} className="result-card card" onClick={() => navigate(getMedicineUrl(med))}>
@@ -361,11 +371,11 @@ export default function SearchPage() {
                                             )}
                                             <div className="result-bottom">
                                                 <div className="result-price-area">
-                                                    <span className="price">₹{cheapestPharmacy ? cheapestPharmacy.stock[med.id].price : med.mrp}</span>
-                                                    {cheapestPharmacy && cheapestPharmacy.stock[med.id].price < med.mrp && (
+                                                    <span className="price">₹{cheapestPharmacy ? cheapestPharmacy.medPrice : med.mrp}</span>
+                                                    {cheapestPharmacy && cheapestPharmacy.medPrice < med.mrp && (
                                                         <>
                                                             <span className="price-original">₹{med.mrp}</span>
-                                                            <span className="price-discount">{Math.round((1 - cheapestPharmacy.stock[med.id].price / med.mrp) * 100)}% off</span>
+                                                            <span className="price-discount">{Math.round((1 - cheapestPharmacy.medPrice / med.mrp) * 100)}% off</span>
                                                         </>
                                                     )}
                                                 </div>

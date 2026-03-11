@@ -31,11 +31,38 @@ export default function Splash() {
     };
 
     const handleDetectLocation = () => {
-        dispatch({
-            type: 'SET_LOCATION',
-            payload: { lat: 17.8484, lng: 78.6832, address: 'Gajwel, Siddipet District, Telangana' }
-        });
-        setStep('auth');
+        if (!navigator.geolocation) {
+            setError('Geolocation is not supported by your browser');
+            handleManualLocation();
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                console.log('[Splash] Detected user location:', latitude, longitude);
+                
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                    const data = await res.json();
+                    const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || 'Current Location';
+                    dispatch({
+                        type: 'SET_LOCATION',
+                        payload: { lat: latitude, lng: longitude, address: data.display_name, city: city }
+                    });
+                } catch (e) {
+                    dispatch({
+                        type: 'SET_LOCATION',
+                        payload: { lat: latitude, lng: longitude, address: 'Your Location', city: 'Your Location' }
+                    });
+                }
+                setStep('auth');
+            },
+            (err) => {
+                console.error('[Splash] Location error:', err);
+                handleManualLocation();
+            }
+        );
     };
 
     const handleManualLocation = () => {
@@ -56,40 +83,56 @@ export default function Splash() {
         }
 
         setLoading(true);
+        console.log('[Splash] Starting auth process. isLogin:', isLogin);
 
         try {
             // Tell onAuthStateChanged to skip — we handle state ourselves
             markLoginHandled();
 
             if (isLogin) {
+                console.log('[Splash] Attempting sign in...');
                 const cred = await signInWithEmailAndPassword(auth, email, password);
+                console.log('[Splash] Sign in successful. UID:', cred.user.uid);
+                
                 const profile = await getUserProfile(cred.user.uid);
                 if (profile && profile.role === 'pharmacy') {
+                    console.warn('[Splash] User account is a Pharmacy account.');
                     setError('This account is a Pharmacy account. Please use Pharmacy login.');
                     await auth.signOut();
                     setLoading(false);
                     return;
                 }
+                
+                console.log('[Splash] Finishing login mapping...');
                 finishLogin(cred.user, cred.user.displayName || profile?.name);
             } else {
+                console.log('[Splash] Attempting registration...');
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log('[Splash] Auth user created. UID:', userCredential.user.uid);
+                
                 if (name) {
                     await updateProfile(userCredential.user, { displayName: name });
+                    console.log('[Splash] Auth profile updated.');
                 }
+                
                 await createUserProfile(userCredential.user.uid, {
                     role: 'user', name: name, email: email,
                 });
+                console.log('[Splash] Firestore user profile created.');
+                
                 finishLogin(userCredential.user, name);
             }
+            console.log('[Splash] Navigating to home...');
             navigate('/');
         } catch (err) {
-            console.error(err);
+            console.error('[Splash] Auth error:', err);
             let message = err.message;
             if (err.code === 'auth/email-already-in-use') message = 'Email is already registered. Please log in.';
             else if (err.code === 'auth/invalid-credential') message = 'Invalid email or password.';
             else if (err.code === 'auth/weak-password') message = 'Password should be at least 6 characters.';
             setError(message);
         } finally {
+            console.log('[Splash] Auth process complete.');
             setLoading(false);
         }
     };
@@ -97,40 +140,51 @@ export default function Splash() {
     const handleGoogleSignIn = async () => {
         setError('');
         setLoading(true);
+        console.log('[Splash] Starting Google sign in...');
+        
         try {
             // Tell onAuthStateChanged to skip
             markLoginHandled();
 
             const cred = await signInWithPopup(auth, googleProvider);
+            console.log('[Splash] Google sign in successful. UID:', cred.user.uid);
+            
             const profile = await getUserProfile(cred.user.uid);
             if (profile && profile.role === 'pharmacy') {
+                console.warn('[Splash] Google account is a Pharmacy account.');
                 setError('This Google account is a Pharmacy account. Please use Pharmacy login.');
                 await auth.signOut();
                 setLoading(false);
                 return;
             }
+            
             if (!profile) {
+                console.log('[Splash] New Google user. Creating profile...');
                 await createUserProfile(cred.user.uid, {
                     role: 'user',
                     name: cred.user.displayName || cred.user.email.split('@')[0],
                     email: cred.user.email,
                 });
+                console.log('[Splash] Firestore user profile created.');
             }
+            
             finishLogin(cred.user, cred.user.displayName || profile?.name);
+            console.log('[Splash] Navigating to home...');
             navigate('/');
         } catch (err) {
-            console.error(err);
+            console.error('[Splash] Google sign in error:', err);
             let message = err.message;
             if (err.code === 'auth/popup-closed-by-user') message = 'Google sign in was cancelled.';
             setError(message);
         } finally {
+            console.log('[Splash] Google auth process complete.');
             setLoading(false);
         }
     };
 
     const handleSkip = () => {
         dispatch({ type: 'SET_LOCATION', payload: { lat: 17.8484, lng: 78.6832, address: 'Gajwel, Siddipet District, Telangana' } });
-        dispatch({ type: 'SET_LOGGED_IN' }); // fallback to bypass auth entirely
+        dispatch({ type: 'SKIP_SPLASH' }); // bypass splash without logging in
         navigate('/');
     };
 

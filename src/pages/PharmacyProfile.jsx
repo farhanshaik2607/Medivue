@@ -1,23 +1,48 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Star, Clock, Phone, Truck, Navigation, ExternalLink } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Clock, Phone, Truck, Navigation, ExternalLink, Loader } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { pharmacies, pharmacyReviews } from '../data/pharmacies';
-import { medicines } from '../data/medicines';
+import { getPharmacyProfile, getPharmacyInventory } from '../services/firestoreService';
 import './PharmacyProfile.css';
 
 export default function PharmacyProfile() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useApp();
-    const pharmacy = pharmacies.find(p => p.id === parseInt(id));
+    const [pharmacy, setPharmacy] = useState(null);
+    const [inventory, setInventory] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        async function fetchPharmacy() {
+            setLoading(true);
+            try {
+                const profile = await getPharmacyProfile(id);
+                if (!cancelled && profile) {
+                    setPharmacy(profile);
+                    const inv = await getPharmacyInventory(id);
+                    if (!cancelled) setInventory(inv.filter(item => item.qty > 0));
+                }
+            } catch (e) {
+                console.error('Error fetching pharmacy profile:', e);
+            }
+            if (!cancelled) setLoading(false);
+        }
+        fetchPharmacy();
+        return () => { cancelled = true; };
+    }, [id]);
+
+    if (loading) return (
+        <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+            <div style={{ textAlign: 'center' }}>
+                <Loader size={32} className="spin" style={{ color: 'var(--primary)', marginBottom: '16px' }} />
+                <p style={{ color: 'var(--gray-500)' }}>Loading pharmacy...</p>
+            </div>
+        </div>
+    );
 
     if (!pharmacy) return <div className="page"><div className="empty-state"><h3>Pharmacy not found</h3></div></div>;
-
-    const reviews = pharmacyReviews.filter(r => r.pharmacyId === pharmacy.id);
-    const stockMeds = Object.entries(pharmacy.stock).filter(([, s]) => s.inStock).map(([medId, s]) => {
-        const med = medicines.find(m => m.id === parseInt(medId));
-        return med ? { ...med, storePrice: s.price, storeQty: s.qty } : null;
-    }).filter(Boolean);
 
     return (
         <div className="page-plain pharmacy-page">
@@ -27,23 +52,24 @@ export default function PharmacyProfile() {
             </div>
 
             <div className="pp-hero">
-                <div className="pp-icon">{pharmacy.image}</div>
+                <div className="pp-icon">🏥</div>
                 <h2 className="pp-name">{pharmacy.name}</h2>
                 <p className="pp-address"><MapPin size={13} /> {pharmacy.address}</p>
                 <div className="pp-meta-row">
-                    <span className={`ph-status ${pharmacy.isOpen ? 'open' : 'closed'}`}>{pharmacy.isOpen ? 'Open Now' : 'Closed'}</span>
-                    <span className="pp-hours"><Clock size={12} /> {pharmacy.openTime} - {pharmacy.closeTime}</span>
-                    <span className="pp-dist">{pharmacy.distance} km away</span>
+                    <span className={`ph-status ${pharmacy.isOpen !== false ? 'open' : 'closed'}`}>{pharmacy.isOpen !== false ? 'Open Now' : 'Closed'}</span>
+                    <span className="pp-hours"><Clock size={12} /> {pharmacy.openTime || '09:00'} - {pharmacy.closeTime || '21:00'}</span>
                 </div>
                 <div className="pp-rating-row">
-                    <div className="md-rating"><Star size={14} className="star filled" /> {pharmacy.rating}</div>
-                    <span className="text-xs" style={{ color: 'var(--gray-500)' }}>{pharmacy.reviews} reviews</span>
+                    <div className="md-rating"><Star size={14} className="star filled" /> {pharmacy.rating || 0}</div>
+                    <span className="text-xs" style={{ color: 'var(--gray-500)' }}>{pharmacy.reviews || 0} reviews</span>
                 </div>
             </div>
 
             <div className="pp-actions">
-                <button className="btn btn-outline"><Phone size={14} /> Call</button>
-                <button className="btn btn-outline"><Navigation size={14} /> Directions</button>
+                {pharmacy.phone && <button className="btn btn-outline" onClick={() => window.open(`tel:${pharmacy.phone}`)}><Phone size={14} /> Call</button>}
+                <button className="btn btn-outline" onClick={() => {
+                    if (pharmacy.lat && pharmacy.lng) window.open(`https://www.google.com/maps/dir/?api=1&destination=${pharmacy.lat},${pharmacy.lng}`, '_blank');
+                }}><Navigation size={14} /> Directions</button>
                 {pharmacy.deliveryAvailable && (
                     <div className="pp-delivery-info">
                         <Truck size={14} />
@@ -56,26 +82,28 @@ export default function PharmacyProfile() {
             <div className="divider" />
 
             <div className="section-header">
-                <h2>Available Medicines ({stockMeds.length})</h2>
+                <h2>Available Medicines ({inventory.length})</h2>
             </div>
             <div className="pp-medicines">
-                {stockMeds.map(med => (
-                    <div key={med.id} className="pp-med-row">
-                        <div className="pp-med-info" onClick={() => navigate(`/medicine/${med.id}`)}>
-                            <span className="pp-med-emoji">{med.image}</span>
+                {inventory.length > 0 ? inventory.map(item => (
+                    <div key={item.id} className="pp-med-row">
+                        <div className="pp-med-info">
+                            <span className="pp-med-emoji">💊</span>
                             <div>
-                                <h4 className="pp-med-name">{med.name}</h4>
-                                <p className="pp-med-salt">{med.salt}</p>
-                                <p className="pp-med-pack">{med.packSize}</p>
+                                <h4 className="pp-med-name">{item.name}</h4>
+                                <p className="pp-med-salt">{item.description || item.salt || ''}</p>
+                                <p className="pp-med-pack">{item.category || ''}</p>
                             </div>
                         </div>
                         <div className="pp-med-action">
-                            <span className="price">₹{med.storePrice}</span>
-                            {med.storePrice < med.mrp && <span className="price-original">₹{med.mrp}</span>}
-                            <button className="btn btn-sm btn-primary" onClick={() => addToCart(med.id, pharmacy.id, med.name, med.storePrice)}>Add</button>
+                            <span className="price">₹{item.price}</span>
+                            <span className="text-xs" style={{ color: 'var(--gray-500)' }}>Qty: {item.qty}</span>
+                            <button className="btn btn-sm btn-primary" onClick={() => addToCart(item.id, pharmacy.id, item.name, item.price)}>Add</button>
                         </div>
                     </div>
-                ))}
+                )) : (
+                    <p className="text-sm" style={{ padding: '16px', color: 'var(--gray-400)' }}>No medicines in stock</p>
+                )}
             </div>
 
             <div className="divider" />
@@ -84,18 +112,7 @@ export default function PharmacyProfile() {
                 <h2>Reviews</h2>
             </div>
             <div className="pp-reviews">
-                {reviews.length > 0 ? reviews.map(r => (
-                    <div key={r.id} className="pp-review card card-body">
-                        <div className="pp-review-top">
-                            <span className="pp-reviewer">{r.user}</span>
-                            <div className="md-rating" style={{ fontSize: '12px' }}><Star size={12} className="star filled" /> {r.rating}</div>
-                        </div>
-                        <p className="pp-review-text">{r.comment}</p>
-                        <span className="text-xs">{r.date}</span>
-                    </div>
-                )) : (
-                    <p className="text-sm" style={{ padding: '0 16px', color: 'var(--gray-400)' }}>No reviews yet</p>
-                )}
+                <p className="text-sm" style={{ padding: '0 16px', color: 'var(--gray-400)' }}>No reviews yet</p>
             </div>
         </div>
     );

@@ -2,26 +2,25 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Star, Trophy, Zap } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { medicines } from '../data/medicines';
-import { pharmacies } from '../data/pharmacies';
 import './BrandComparison.css';
 
 export default function BrandComparison() {
     const { salt } = useParams();
     const navigate = useNavigate();
-    const { state, addToCart } = useApp();
+    const { state, addToCart, getPharmaciesWithMedicine } = useApp();
     const decodedSalt = decodeURIComponent(salt);
 
     const brands = medicines.filter(m => m.salt === decodedSalt);
 
-    const getBestPrice = (medId) => {
-        const available = pharmacies.filter(p => p.stock[medId]?.inStock && p.distance <= state.radius);
+    const getBestPrice = (medId, medMrp) => {
+        const available = getPharmaciesWithMedicine(medId, medMrp);
         if (available.length === 0) return null;
-        const cheapest = available.sort((a, b) => a.stock[medId].price - b.stock[medId].price)[0];
-        return { price: cheapest.stock[medId].price, pharmacy: cheapest };
+        const cheapest = available[0]; // Already sorted by price
+        return { price: cheapest.medPrice, pharmacy: cheapest };
     };
 
     const brandsWithPrices = brands.map(med => {
-        const best = getBestPrice(med.id);
+        const best = getBestPrice(med.id, med.mrp);
         return { ...med, bestPrice: best?.price || med.mrp, bestPharmacy: best?.pharmacy || null, available: !!best };
     }).sort((a, b) => a.bestPrice - b.bestPrice);
 

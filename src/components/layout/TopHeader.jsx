@@ -76,7 +76,7 @@ export default function TopHeader() {
                         <ClipboardList size={20} /> <span className="d-nav-text">Orders</span>
                     </button>
                     <button className="d-nav-item" onClick={() => navigate('/profile')}>
-                        <User size={20} /> <span className="d-nav-text">{state.user?.name?.split(' ')[0] || 'Profile'}</span>
+                        <User size={20} /> <span className="d-nav-text">{state.isLoggedIn ? (state.user?.name?.split(' ')[0] || 'Profile') : 'Login'}</span>
                     </button>
                     <button className="d-nav-item d-cart" onClick={() => navigate('/cart')}>
                         <ShoppingCart size={20} />

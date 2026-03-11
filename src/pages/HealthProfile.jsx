@@ -11,6 +11,35 @@ export default function HealthProfile() {
     const [activeTab, setActiveTab] = useState('overview'); // On mobile this controls view. On desktop, overview just means no specific tab selected if we want, but let's default to family on desktop or just keep overview as empty state.
     const user = state.user;
 
+    if (!state.isLoggedIn) {
+        return (
+            <div className="page-plain hp-page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'var(--sp-6)', minHeight: '80vh' }}>
+                <div style={{ background: 'var(--primary-100)', color: 'var(--primary)', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'var(--sp-4)' }}>
+                    <User size={32} />
+                </div>
+                <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 600, marginBottom: 'var(--sp-2)' }}>Create an Account</h2>
+                <p style={{ color: 'var(--gray-500)', marginBottom: 'var(--sp-6)', maxWidth: 300, lineHeight: 1.5 }}>
+                    Sign up or log in to view your health profile, saved medicines, and manage your family members.
+                </p>
+                <button 
+                    className="btn btn-primary btn-lg" 
+                    onClick={() => {
+                        if (handleLogout) {
+                            handleLogout().then(() => {
+                                navigate('/splash?role=user');
+                            });
+                        } else {
+                            navigate('/splash?role=user');
+                        }
+                    }}
+                    style={{ minWidth: 200 }}
+                >
+                    Sign Up / Log In
+                </button>
+            </div>
+        );
+    }
+
     const menuItems = [
         { id: 'family', icon: <Users size={18} />, label: 'Family Members', count: user.familyMembers.length, color: '#3B82F6' },
         { id: 'saved', icon: <Heart size={18} />, label: 'Saved Medicines', count: user.savedMedicines.length, color: '#EF4444' },

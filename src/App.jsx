@@ -21,6 +21,7 @@ import Offers from './pages/Offers';
 import PharmacyDashboard from './pages/PharmacyDashboard';
 import InventoryManager from './pages/InventoryManager';
 import PharmacyRequests from './pages/PharmacyRequests';
+import PharmacyOrders from './pages/PharmacyOrders';
 import RequestMedicine from './pages/RequestMedicine';
 import MyRequests from './pages/MyRequests';
 
@@ -70,6 +71,7 @@ function AppLayout() {
         <Route path="/pharmacy-dashboard" element={<PharmacyDashboard />} />
         <Route path="/pharmacy-inventory" element={<InventoryManager />} />
         <Route path="/pharmacy-requests" element={<PharmacyRequests />} />
+        <Route path="/pharmacy-orders" element={<PharmacyOrders />} />
         <Route path="/profile" element={<HealthProfile />} />
         <Route path="*" element={<Navigate to="/pharmacy-dashboard" replace />} />
       </Routes>

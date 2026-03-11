@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Share2, Shield, AlertTriangle, MapPin, Star, Clock, Truck, ShoppingBag, ChevronRight, Info, BadgeCheck, Zap, CheckCircle2, Loader, ExternalLink, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { medicines } from '../data/medicines';
-import { pharmacies } from '../data/pharmacies';
-import { simulateStock } from '../services/pharmacyService';
+import { createMedicineRequest } from '../services/firestoreService';
 import PharmacyMap from '../components/Map/PharmacyMap';
 import './MedicineDetail.css';
 
@@ -97,18 +96,42 @@ export default function MedicineDetail() {
 
     // Get pharmacies with this medicine
     const allNearbyPharmacies = getNearbyPharmacies();
-    const availablePharmacies = getPharmaciesWithMedicine(med.id, med.mrp);
+    const medicine = med;
+    const nearbyPharmacies = med ? getPharmaciesWithMedicine(med.id, med.mrp, med.name) : [];
     const substitutes = med.source === 'local' && med.substitutes
         ? med.substitutes.map(sid => medicines.find(m => m.id === sid)).filter(Boolean)
         : [];
-    const cheapest = availablePharmacies[0];
+    const cheapest = nearbyPharmacies[0];
 
-    const handleSignalStores = () => {
+    const handleSignalStores = async () => {
+        if (!state.user || !state.user.uid) {
+            alert('Please login to signal stores');
+            return;
+        }
+        
         setIsSignaling(true);
-        setTimeout(() => {
-            setIsSignaling(false);
+        try {
+            await createMedicineRequest({
+                userId: state.user.uid,
+                userName: state.user.displayName || 'Customer',
+                userPhone: state.user.phoneNumber || '',
+                userLat: state.location.lat,
+                userLng: state.location.lng,
+                userAddress: state.location.address || '',
+                medicineId: med.id,
+                medicineName: med.name,
+                quantity: 1, // Defaulting to 1 strip
+                urgency: 'normal',
+                prescriptionUrl: null,
+                deliveryOption: state.deliveryMode || 'delivery',
+            });
             setIsSignaled(true);
-        }, 1500);
+        } catch (error) {
+            console.error('Failed to signal nearby stores:', error);
+            alert('Failed to send signal. Please try again later.');
+        } finally {
+            setIsSignaling(false);
+        }
     };
 
     const getCategoryColor = (category) => {
@@ -188,13 +211,13 @@ export default function MedicineDetail() {
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                         <Loader size={12} className="spin" /> Finding pharmacies...
                                     </span>
-                                ) : availablePharmacies.length > 0 ? `${availablePharmacies.length} stores in stock` : 'Out of stock nearby'}
+                                ) : nearbyPharmacies.length > 0 ? `${nearbyPharmacies.length} stores in stock` : 'Out of stock nearby'}
                             </span>
                         </div>
 
-                        <PharmacyMap pharmacies={allNearbyPharmacies} userLocation={state.location} medId={med.id} medicineMrp={med.mrp} />
+                        <PharmacyMap pharmacies={allNearbyPharmacies} userLocation={state.location} medId={med.id} medicineMrp={med.mrp} medicineName={med.name} />
 
-                        {!state.pharmaciesLoading && availablePharmacies.length === 0 && (
+                        {!state.pharmaciesLoading && nearbyPharmacies.length === 0 && (
                             <div className="md-out-of-stock-action card card-body" style={{ marginTop: 'var(--sp-4)' }}>
                                 <div className="md-oos-content">
                                     <AlertTriangle size={24} color="var(--warning)" className="mb-2" />
@@ -227,11 +250,11 @@ export default function MedicineDetail() {
                     <div className="divider mobile-only" />
 
                     {/* All pharmacy prices */}
-                    {availablePharmacies.length > 0 && (
+                    {nearbyPharmacies.length > 0 && (
                         <div className="md-pricing-section">
                             <div className="md-all-prices" style={{ marginTop: 0 }}>
                                 <h4>Compare Prices at Nearby Pharmacies</h4>
-                                {availablePharmacies.map(ph => (
+                                {nearbyPharmacies.map(ph => (
                                     <div key={ph.id} className="md-price-row" onClick={() => {
                                         if (ph.googleMapsUri) {
                                             window.open(ph.googleMapsUri, '_blank');
@@ -341,7 +364,8 @@ export default function MedicineDetail() {
                                 </div>
                                 <div className="scroll-row">
                                     {substitutes.map(sub => {
-                                        const subPh = pharmacies.filter(p => p.stock[sub.id]?.inStock).sort((a, b) => a.stock[sub.id].price - b.stock[sub.id].price)[0];
+                                        const subPharmacies = getPharmaciesWithMedicine(sub.id, sub.mrp);
+                                        const subPh = subPharmacies.length > 0 ? subPharmacies[0] : null;
                                         return (
                                             <div key={sub.id} className="sub-card card" onClick={() => navigate(`/medicine/${sub.id}`)}>
                                                 <div className="sub-img">{sub.image}</div>
@@ -349,7 +373,7 @@ export default function MedicineDetail() {
                                                     <h4 className="sub-name">{sub.name}</h4>
                                                     <p className="sub-mfr">{sub.manufacturer}</p>
                                                     <div className="sub-price">
-                                                        <span className="price">₹{subPh ? subPh.stock[sub.id].price : sub.mrp}</span>
+                                                        <span className="price">₹{subPh ? subPh.medPrice : sub.mrp}</span>
                                                         <span className="med-card-pack">{sub.packSize}</span>
                                                     </div>
                                                 </div>
@@ -367,7 +391,7 @@ export default function MedicineDetail() {
                     <div className="md-pricing-section" style={{ paddingTop: 0 }}>
                         <div className="md-pricing-header desktop-hidden" style={{ paddingTop: 'var(--sp-4)' }}>
                             <h3>Best Price Near You</h3>
-                            {availablePharmacies.length > 0 && <span className="badge badge-success">{availablePharmacies.length} stores</span>}
+                            {nearbyPharmacies.length > 0 && <span className="badge badge-success">{nearbyPharmacies.length} stores</span>}
                         </div>
                         {cheapest ? (
                             <div className="md-best-price card">
@@ -393,7 +417,7 @@ export default function MedicineDetail() {
                         )}
 
                         <div className="desktop-hidden" style={{ marginTop: 'var(--sp-4)' }}>
-                            {availablePharmacies.length <= 1 && med.source === 'local' && (
+                            {nearbyPharmacies.length <= 1 && med.source === 'local' && (
                                 <button className="btn btn-secondary btn-block" onClick={() => navigate(`/brand-comparison/${encodeURIComponent(med.salt)}`)}>
                                     Compare All Brands <ChevronRight size={14} />
                                 </button>

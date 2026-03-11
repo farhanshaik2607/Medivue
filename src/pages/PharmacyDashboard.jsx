@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, AlertTriangle, Clock, Users, Plus, ClipboardList, Settings, LogOut, Bell, TrendingUp, ShieldCheck } from 'lucide-react';
+import { Package, AlertTriangle, Clock, Users, Plus, ClipboardList, Settings, LogOut, Bell, TrendingUp, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getPharmacyProfile, subscribeToInventory } from '../services/firestoreService';
 import './PharmacyDashboard.css';
@@ -117,9 +117,9 @@ export default function PharmacyDashboard() {
                         <div className="pd-action-icon" style={{ background: '#F0FDF4', color: '#16A34A' }}><Plus size={22} /></div>
                         <span className="pd-action-label">Add Medicine</span>
                     </button>
-                    <button className="pd-action-card" onClick={() => { }}>
-                        <div className="pd-action-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}><Settings size={22} /></div>
-                        <span className="pd-action-label">Settings</span>
+                    <button className="pd-action-card" onClick={() => navigate('/pharmacy-orders')}>
+                        <div className="pd-action-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}><ShoppingBag size={22} /></div>
+                        <span className="pd-action-label">Manage Orders</span>
                     </button>
                 </div>
             </div>
@@ -180,6 +180,10 @@ export default function PharmacyDashboard() {
                 <button className="pd-nav-item" onClick={() => navigate('/pharmacy-requests')}>
                     <ClipboardList size={20} />
                     <span>Requests</span>
+                </button>
+                <button className="pd-nav-item" onClick={() => navigate('/pharmacy-orders')}>
+                    <ShoppingBag size={20} />
+                    <span>Orders</span>
                 </button>
                 <button className="pd-nav-item" onClick={doLogout}>
                     <LogOut size={20} />

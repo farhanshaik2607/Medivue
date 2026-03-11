@@ -9,20 +9,25 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // ==================== USER PROFILES ====================
 
 export async function createUserProfile(uid, data) {
+    console.log('[Firestore] Creating user profile...', uid);
     await setDoc(doc(db, 'users', uid), {
         ...data,
         createdAt: serverTimestamp(),
     });
+    console.log('[Firestore] User profile created.');
 }
 
 export async function getUserProfile(uid) {
+    console.log('[Firestore] Fetching user profile...', uid);
     const snap = await getDoc(doc(db, 'users', uid));
+    console.log('[Firestore] User profile fetched. Exists:', snap.exists());
     return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
 // ==================== PHARMACY PROFILES ====================
 
 export async function createPharmacyProfile(uid, data) {
+    console.log('[Firestore] Creating pharmacy profile...', uid);
     // Create user doc with role
     await setDoc(doc(db, 'users', uid), {
         role: 'pharmacy',
@@ -30,6 +35,8 @@ export async function createPharmacyProfile(uid, data) {
         email: data.email,
         createdAt: serverTimestamp(),
     });
+    console.log('[Firestore] Primary user doc created for pharmacy.');
+
     // Create pharmacy profile doc
     await setDoc(doc(db, 'pharmacies', uid), {
         name: data.pharmacyName,
@@ -48,15 +55,53 @@ export async function createPharmacyProfile(uid, data) {
         isOpen: true,
         createdAt: serverTimestamp(),
     });
+    console.log('[Firestore] Pharmacy details doc created.');
 }
 
 export async function getPharmacyProfile(uid) {
+    console.log('[Firestore] Fetching pharmacy profile...', uid);
     const snap = await getDoc(doc(db, 'pharmacies', uid));
+    console.log('[Firestore] Pharmacy profile fetched. Exists:', snap.exists());
     return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
 export async function updatePharmacyProfile(uid, data) {
     await updateDoc(doc(db, 'pharmacies', uid), data);
+}
+
+// Fetch ALL registered pharmacies from Firestore
+export async function getAllRegisteredPharmacies() {
+    console.log('[Firestore] Fetching all registered pharmacies...');
+    const snapshot = await getDocs(collection(db, 'pharmacies'));
+    const pharmacies = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    console.log('[Firestore] Found', pharmacies.length, 'registered pharmacies.');
+    return pharmacies;
+}
+
+// Fetch inventory for a specific pharmacy
+export async function getPharmacyInventory(pharmacyId) {
+    const snapshot = await getDocs(collection(db, 'pharmacies', pharmacyId, 'inventory'));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+// Fetch ALL pharmacies with their inventory (for user interface)
+export async function getAllPharmaciesWithInventory() {
+    console.log('[Firestore] Fetching all pharmacies with inventory...');
+    const pharmacies = await getAllRegisteredPharmacies();
+    const results = [];
+
+    for (const pharmacy of pharmacies) {
+        const inventory = await getPharmacyInventory(pharmacy.id);
+        results.push({
+            ...pharmacy,
+            inventory, // Array of medicine items
+            source: 'firestore',
+            image: '🏥',
+        });
+    }
+
+    console.log('[Firestore] Loaded inventory for', results.length, 'pharmacies.');
+    return results;
 }
 
 // ==================== INVENTORY ====================
@@ -166,6 +211,62 @@ export async function rejectMedicineRequest(requestId, pharmacyId) {
 
 export async function updateRequestStatus(requestId, status) {
     await updateDoc(doc(db, 'requests', requestId), { status });
+}
+
+// ==================== ORDERS ====================
+
+export async function createOrder(orderData) {
+    try {
+        const docRef = await addDoc(collection(db, 'orders'), {
+            ...orderData,
+            status: 'pending', // pending, accepted, rejected, ready, completed
+            createdAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error('🔥 CRITICAL Firebase Error in createOrder:', error);
+        throw error;
+    }
+}
+
+export function subscribeToUserOrders(userId, callback) {
+    const q = query(
+        collection(db, 'orders'),
+        where('userId', '==', userId)
+    );
+    return onSnapshot(q, (snapshot) => {
+        const orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Sort in memory to avoid missing index errors
+        orders.sort((a, b) => {
+            const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+            const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+            return timeB - timeA;
+        });
+        callback(orders);
+    });
+}
+
+export function subscribeToPharmacyOrders(pharmacyId, callback) {
+    const q = query(
+        collection(db, 'orders'),
+        where('pharmacyId', '==', pharmacyId)
+    );
+    return onSnapshot(q, (snapshot) => {
+        const orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Sort in memory to avoid missing index errors
+        orders.sort((a, b) => {
+            const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+            const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+            return timeB - timeA;
+        });
+        callback(orders);
+    }, (error) => {
+        console.error('🔥 CRITICAL Firebase Error in subscribeToPharmacyOrders:', error);
+    });
+}
+
+export async function updateOrderStatus(orderId, status) {
+    await updateDoc(doc(db, 'orders', orderId), { status });
 }
 
 // ==================== FILE UPLOAD ====================

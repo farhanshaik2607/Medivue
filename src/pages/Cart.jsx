@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Minus, Plus, Trash2, Upload, Tag, Truck, ShoppingBag, Shield } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { pharmacies } from '../data/pharmacies';
 import './Cart.css';
 
 export default function Cart() {
-    const { state, dispatch, updateCartQty, removeFromCart, getCartTotal, getCartCount } = useApp();
+    const { state, dispatch, updateCartQty, removeFromCart, getCartTotal, getCartCount, getPharmacyById } = useApp();
     const navigate = useNavigate();
     const cartCount = getCartCount();
     const cartTotal = getCartTotal();
@@ -58,7 +57,7 @@ export default function Cart() {
 
                     {/* Cart Items grouped by pharmacy */}
                     {Object.entries(grouped).map(([phId, items]) => {
-                        const pharmacy = pharmacies.find(p => p.id === parseInt(phId));
+                        const pharmacy = getPharmacyById(phId);
                         const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
                         return (
                             <div key={phId} className="cart-group">

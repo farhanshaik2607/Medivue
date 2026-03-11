@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, AlertCircle, Loader2, MapPin } from 'lucide-react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithPopup } from 'firebase/auth';
@@ -18,6 +18,9 @@ export default function PharmacyLogin() {
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
     const [licenseNumber, setLicenseNumber] = useState('');
+    const [lat, setLat] = useState(0);
+    const [lng, setLng] = useState(0);
+    const [locStatus, setLocStatus] = useState(''); // '' | 'detecting' | 'success' | 'error'
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -30,6 +33,44 @@ export default function PharmacyLogin() {
         });
         dispatch({ type: 'SET_AUTH_LOADING', payload: false });
     };
+
+    const handleDetectLocation = () => {
+        if (!navigator.geolocation) {
+            setError('Geolocation is not supported by your browser');
+            return;
+        }
+        setLocStatus('detecting');
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                setLat(pos.coords.latitude);
+                setLng(pos.coords.longitude);
+                setLocStatus('success');
+                console.log('[PharmacyLogin] Location detected:', pos.coords.latitude, pos.coords.longitude);
+                // Auto-fill address via reverse geocoding
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+                    const data = await res.json();
+                    if (data.display_name && !address) {
+                        setAddress(data.display_name);
+                    }
+                } catch (e) {
+                    console.log('[PharmacyLogin] Reverse geocoding failed:', e);
+                }
+            },
+            (err) => {
+                console.error('[PharmacyLogin] Location error:', err);
+                setLocStatus('error');
+                setError('Could not detect location. Please enable location permissions and click the 📍 button.');
+            }
+        );
+    };
+
+    // Auto-detect location when switching to registration mode
+    useEffect(() => {
+        if (!isLogin && locStatus === '') {
+            handleDetectLocation();
+        }
+    }, [isLogin]);
 
     const handleAuth = async (e) => {
         if (e) e.preventDefault();
@@ -44,38 +85,57 @@ export default function PharmacyLogin() {
         }
 
         setLoading(true);
+        console.log('[PharmacyLogin] Starting auth process. isLogin:', isLogin);
+        
         try {
             // Tell onAuthStateChanged to skip — we'll handle state ourselves
             markLoginHandled();
 
             if (isLogin) {
+                console.log('[PharmacyLogin] Attempting sign in...');
                 const cred = await signInWithEmailAndPassword(auth, email, password);
+                console.log('[PharmacyLogin] Sign in successful. UID:', cred.user.uid);
+                
                 const profile = await getUserProfile(cred.user.uid);
                 if (!profile || profile.role !== 'pharmacy') {
+                    console.warn('[PharmacyLogin] Not a pharmacy account.');
                     setError('This account is not a Pharmacy account. Please use User login.');
                     await auth.signOut();
                     setLoading(false);
                     return;
                 }
+                
+                console.log('[PharmacyLogin] Finishing login mapping...');
                 finishLogin(cred.user, 'pharmacy', cred.user.displayName || profile.name);
+                console.log('[PharmacyLogin] Navigating to dashboard...');
                 navigate('/pharmacy-dashboard');
             } else {
+                console.log('[PharmacyLogin] Attempting registration...');
                 const cred = await createUserWithEmailAndPassword(auth, email, password);
+                console.log('[PharmacyLogin] Auth user created. UID:', cred.user.uid);
+                
                 await updateProfile(cred.user, { displayName: ownerName });
+                console.log('[PharmacyLogin] Auth profile updated with name.');
+                
                 await createPharmacyProfile(cred.user.uid, {
                     name: ownerName, email, pharmacyName, address, phone, licenseNumber,
+                    lat, lng
                 });
+                console.log('[PharmacyLogin] Firestore pharmacy profile created.');
+                
                 finishLogin(cred.user, 'pharmacy', ownerName);
+                console.log('[PharmacyLogin] Navigating to dashboard...');
                 navigate('/pharmacy-dashboard');
             }
         } catch (err) {
-            console.error(err);
+            console.error('[PharmacyLogin] Auth error:', err);
             let message = err.message;
             if (err.code === 'auth/email-already-in-use') message = 'Email already registered. Please log in.';
             else if (err.code === 'auth/invalid-credential') message = 'Invalid email or password.';
             else if (err.code === 'auth/weak-password') message = 'Password should be at least 6 characters.';
             setError(message);
         } finally {
+            console.log('[PharmacyLogin] Auth process complete.');
             setLoading(false);
         }
     };
@@ -83,33 +143,45 @@ export default function PharmacyLogin() {
     const handleGoogleSignIn = async () => {
         setError('');
         setLoading(true);
+        console.log('[PharmacyLogin] Starting Google sign in...');
+        
         try {
             // Tell onAuthStateChanged to skip
             markLoginHandled();
 
             const cred = await signInWithPopup(auth, googleProvider);
+            console.log('[PharmacyLogin] Google sign in successful. UID:', cred.user.uid);
+            
             const profile = await getUserProfile(cred.user.uid);
             if (profile && profile.role === 'user') {
+                console.warn('[PharmacyLogin] Google account is a User account.');
                 setError('This Google account is a User account. Please use User login.');
                 await auth.signOut();
                 setLoading(false);
                 return;
             }
+            
             if (!profile) {
+                console.log('[PharmacyLogin] New Google user. Creating pharmacy profile...');
                 await createPharmacyProfile(cred.user.uid, {
                     name: cred.user.displayName || 'Owner',
                     email: cred.user.email,
                     pharmacyName: `${cred.user.displayName || 'My'}'s Pharmacy`,
                     address: '', phone: '', licenseNumber: '',
+                    lat: 0, lng: 0 // Placeholder for Google login
                 });
+                console.log('[PharmacyLogin] Pharmacy profile created.');
             }
+            
             finishLogin(cred.user, 'pharmacy', cred.user.displayName || profile?.name || 'Owner');
+            console.log('[PharmacyLogin] Navigating to dashboard...');
             navigate('/pharmacy-dashboard');
         } catch (err) {
-            console.error(err);
+            console.error('[PharmacyLogin] Google sign in error:', err);
             if (err.code === 'auth/popup-closed-by-user') setError('Google sign in was cancelled.');
             else setError(err.message);
         } finally {
+            console.log('[PharmacyLogin] Google auth process complete.');
             setLoading(false);
         }
     };
@@ -156,8 +228,16 @@ export default function PharmacyLogin() {
                             </div>
                             <div className="form-group">
                                 <label className="form-label" htmlFor="address">Address *</label>
-                                <input className="form-input" placeholder="Full pharmacy address" value={address}
-                                    onChange={e => setAddress(e.target.value)} id="address" disabled={loading} />
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <input className="form-input" placeholder="Full pharmacy address" value={address}
+                                        onChange={e => setAddress(e.target.value)} id="address" disabled={loading} style={{ flex: 1 }} />
+                                    <button type="button" className={`btn ${locStatus === 'success' ? 'btn-secondary' : 'btn-outline'}`} 
+                                        onClick={handleDetectLocation} style={{ padding: '0 12px', height: '44px' }} title="Detect my current location">
+                                        {locStatus === 'detecting' ? <Loader2 size={16} className="spin" /> : <MapPin size={16} />}
+                                    </button>
+                                </div>
+                                {locStatus === 'success' && <p className="text-xs" style={{ color: 'var(--success)', marginTop: '4px' }}>✓ GPS Location captured</p>}
+                                {locStatus === 'error' && <p className="text-xs" style={{ color: 'var(--danger)', marginTop: '4px' }}>× Could not get location</p>}
                             </div>
                             <div className="form-group">
                                 <label className="form-label" htmlFor="phone">Phone Number *</label>

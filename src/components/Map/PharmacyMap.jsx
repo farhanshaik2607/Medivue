@@ -53,19 +53,46 @@ function ChangeView({ center, zoom }) {
 
 /**
  * Get stock info for a pharmacy+medicine combination.
- * Supports both static pharmacies (with stock object) and real pharmacies (simulated stock).
+ * Supports both static pharmacies (with stock object) and real pharmacies (with inventory array/simulated stock).
  */
-function getStockInfo(pharmacy, medId, medicineMrp = 100) {
+function getStockInfo(pharmacy, medId, medicineMrp = 100, medicineName = '') {
     // For local pharmacies with explicit stock data
     if (pharmacy.source !== 'google' && pharmacy.stock && pharmacy.stock[medId]) {
         return pharmacy.stock[medId];
     }
 
-    // For Google Places pharmacies or local without specific stock, simulate
+    // For real registered Firestore pharmacies with an inventory array
+    if (pharmacy.inventory && Array.isArray(pharmacy.inventory) && pharmacy.inventory.length > 0) {
+        let medName = medicineName ? medicineName.toLowerCase().trim() : '';
+        const matchingItem = pharmacy.inventory.find(item => {
+            const itemName = (item.name || '').toLowerCase().trim();
+            if (!medName || !itemName) return false;
+            // Exact match
+            if (itemName === medName) return true;
+            // Partial match
+            if (itemName.includes(medName) || medName.includes(itemName)) return true;
+            // Word-level match
+            const medWords = medName.split(/\s+/);
+            const itemWords = itemName.split(/\s+/);
+            return (medWords[0] && itemWords[0] && medWords[0] === itemWords[0]);
+        });
+
+        if (matchingItem && matchingItem.qty > 0) {
+            return {
+                price: matchingItem.price || medicineMrp,
+                qty: matchingItem.qty,
+                inStock: true
+            };
+        } else {
+            return { price: medicineMrp, qty: 0, inStock: false };
+        }
+    }
+
+    // For Google Places pharmacies or legacy pharmacies without specific stock, simulate
     return simulateStock(pharmacy.id, medId, medicineMrp);
 }
 
-export default function PharmacyMap({ pharmacies, userLocation, medId, medicineMrp = 100 }) {
+export default function PharmacyMap({ pharmacies, userLocation, medId, medicineMrp = 100, medicineName = '' }) {
     if (!userLocation || !userLocation.lat || !userLocation.lng) {
         return <div className="map-placeholder glass-panel">Location not available</div>;
     }
@@ -93,7 +120,7 @@ export default function PharmacyMap({ pharmacies, userLocation, medId, medicineM
 
                 {/* Pharmacies */}
                 {pharmacies.map(pharmacy => {
-                    const stockInfo = getStockInfo(pharmacy, medId, medicineMrp);
+                    const stockInfo = getStockInfo(pharmacy, medId, medicineMrp, medicineName);
                     const inStock = stockInfo && stockInfo.inStock && stockInfo.qty > 0;
 
                     return (
