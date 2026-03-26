@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Search, Edit3, Trash2, X, Package, AlertTriangle, Clock, TrendingUp, ClipboardList, LogOut } from 'lucide-react';
+import { ArrowLeft, Plus, Search, Edit3, Trash2, X, Package, AlertTriangle, Clock, TrendingUp, ClipboardList, User, ShoppingBag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { addInventoryItem, updateInventoryItem, deleteInventoryItem, subscribeToInventory } from '../services/firestoreService';
 import { categories } from '../data/medicines';
@@ -101,7 +101,7 @@ export default function InventoryManager() {
         return matchesSearch;
     });
 
-    const doLogout = async () => { await handleLogout(); navigate('/role-select'); };
+
 
     return (
         <div className="inv-page">
@@ -247,8 +247,11 @@ export default function InventoryManager() {
                 <button className="pd-nav-item" onClick={() => navigate('/pharmacy-requests')}>
                     <ClipboardList size={20} /><span>Requests</span>
                 </button>
-                <button className="pd-nav-item" onClick={doLogout}>
-                    <LogOut size={20} /><span>Logout</span>
+                <button className="pd-nav-item" onClick={() => navigate('/pharmacy-orders')}>
+                    <ShoppingBag size={20} /><span>Orders</span>
+                </button>
+                <button className="pd-nav-item" onClick={() => navigate('/pharmacy-owner-profile')}>
+                    <User size={20} /><span>Profile</span>
                 </button>
             </nav>
         </div>

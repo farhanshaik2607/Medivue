@@ -443,9 +443,14 @@ export default function MedicineDetail() {
                             <span className="price" style={{ fontSize: '28px' }}>₹{cheapest.medPrice}</span>
                             {cheapest.medPrice < med.mrp && <span className="text-sm" style={{ color: 'var(--success)', fontWeight: 600 }}>You save ₹{med.mrp - cheapest.medPrice}</span>}
                             <span className="text-xs" style={{ color: 'var(--gray-500)', marginBottom: 'var(--sp-4)', display: 'block' }}>Sold by {cheapest.name}</span>
-                            <button className="btn btn-primary btn-block btn-lg" onClick={() => addToCart(med.id, cheapest.id, med.name, cheapest.medPrice)}>
-                                <ShoppingBag size={18} /> Add to Cart
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button className="btn btn-primary btn-lg" style={{ flex: 1 }} onClick={() => addToCart(med.id, cheapest.id, med.name, cheapest.medPrice)}>
+                                    <ShoppingBag size={18} /> Add to Cart
+                                </button>
+                                <button className={`btn btn-lg ${isSaved ? 'btn-secondary' : 'btn-outline'}`} onClick={() => dispatch({ type: 'TOGGLE_SAVED_MED', payload: med.id })}>
+                                    <Heart size={18} fill={isSaved ? '#EF4444' : 'none'} color={isSaved ? '#EF4444' : 'currentColor'} /> {isSaved ? 'Saved' : 'Save'}
+                                </button>
+                            </div>
                             <div style={{ marginTop: 'var(--sp-3)', fontSize: '11px', color: 'var(--gray-500)', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
                                 <Shield size={12} color="var(--success)" /> Genuine Product · Easy Returns
                             </div>
@@ -461,9 +466,14 @@ export default function MedicineDetail() {
                         <span className="price" style={{ fontSize: '18px' }}>₹{cheapest.medPrice}</span>
                         <span className="text-xs">{cheapest.name}</span>
                     </div>
-                    <button className="btn btn-primary btn-lg" onClick={() => addToCart(med.id, cheapest.id, med.name, cheapest.medPrice)}>
-                        Add to Cart
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className={`btn btn-lg ${isSaved ? 'btn-secondary' : 'btn-outline'}`} style={{ padding: '0 16px' }} onClick={() => dispatch({ type: 'TOGGLE_SAVED_MED', payload: med.id })}>
+                            <Heart size={20} fill={isSaved ? '#EF4444' : 'none'} color={isSaved ? '#EF4444' : 'currentColor'} />
+                        </button>
+                        <button className="btn btn-primary btn-lg" style={{ flex: 1 }} onClick={() => addToCart(med.id, cheapest.id, med.name, cheapest.medPrice)}>
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Clock, LogOut, TrendingUp, ClipboardList, CheckCircle, XCircle, Truck, ShoppingBag, MapPin, Loader2 } from 'lucide-react';
+import { ArrowLeft, Package, Clock, User, TrendingUp, ClipboardList, CheckCircle, XCircle, Truck, ShoppingBag, MapPin, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { subscribeToPharmacyOrders, updateOrderStatus } from '../services/firestoreService';
 import './PharmacyRequests.css'; // Reusing standard pharmacy list styles
@@ -39,7 +39,7 @@ export default function PharmacyOrders() {
         return true;
     });
 
-    const doLogout = async () => { await handleLogout(); navigate('/role-select'); };
+
 
     return (
         <div className="pr-page">
@@ -160,6 +160,9 @@ export default function PharmacyOrders() {
                 </button>
                 <button className="pd-nav-item active" onClick={() => navigate('/pharmacy-orders')}>
                     <ShoppingBag size={20} /><span>Orders</span>
+                </button>
+                <button className="pd-nav-item" onClick={() => navigate('/pharmacy-owner-profile')}>
+                    <User size={20} /><span>Profile</span>
                 </button>
             </nav>
         </div>

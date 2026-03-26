@@ -4,21 +4,10 @@ export const mockUser = {
     phone: '+91 98765 12345',
     email: 'sudeep@email.com',
     avatar: null,
-    addresses: [
-        { id: 1, label: 'Home', address: '42, Palm Meadows, Whitefield', city: 'Bangalore', pin: '560066', isDefault: true, lat: 12.9716, lng: 77.7500 },
-        { id: 2, label: 'Office', address: '5th Floor, Tech Park, Outer Ring Road', city: 'Bangalore', pin: '560103', isDefault: false, lat: 12.9352, lng: 77.6245 },
-    ],
-    familyMembers: [
-        { id: 'fm_1', name: 'Sudeep', relation: 'Self', age: 28, gender: 'Male', allergies: ['Sulfa drugs'], chronicMeds: [{ medId: 29, frequency: 'Daily' }], bloodGroup: 'O+' },
-        { id: 'fm_2', name: 'Anjali', relation: 'Spouse', age: 26, gender: 'Female', allergies: [], chronicMeds: [], bloodGroup: 'A+' },
-        { id: 'fm_3', name: 'Ravi Kumar', relation: 'Father', age: 58, gender: 'Male', allergies: ['Penicillin'], chronicMeds: [{ medId: 21, frequency: 'Twice daily' }, { medId: 28, frequency: 'Daily' }], bloodGroup: 'B+' },
-    ],
-    savedMedicines: [1, 5, 8, 17, 29],
-    healthDocuments: [
-        { id: 'hd_1', name: 'Blood Test Report - Feb 2026', type: 'Lab Report', date: '2026-02-15', size: '2.4 MB' },
-        { id: 'hd_2', name: 'Thyroid Profile', type: 'Lab Report', date: '2026-01-10', size: '1.8 MB' },
-        { id: 'hd_3', name: 'Prescription - Dr. Sharma', type: 'Prescription', date: '2026-02-28', size: '850 KB' },
-    ],
+    addresses: [],
+    familyMembers: [],
+    savedMedicines: [],
+    healthDocuments: [],
 };
 
 export const orders = [

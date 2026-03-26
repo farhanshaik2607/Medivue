@@ -101,6 +101,12 @@ function appReducer(state, action) {
             const newSaved = saved.includes(action.payload) ? saved.filter(id => id !== action.payload) : [...saved, action.payload];
             return { ...state, user: { ...state.user, savedMedicines: newSaved } };
         }
+        case 'ADD_FAMILY_MEMBER':
+            return { ...state, user: { ...state.user, familyMembers: [...state.user.familyMembers, action.payload] } };
+        case 'ADD_ADDRESS':
+            return { ...state, user: { ...state.user, addresses: [...state.user.addresses, action.payload] } };
+        case 'ADD_DOCUMENT':
+            return { ...state, user: { ...state.user, healthDocuments: [...state.user.healthDocuments, action.payload] } };
         // New actions for API-powered features
         case 'SET_SEARCH_LOADING':
             return { ...state, searchLoading: action.payload };

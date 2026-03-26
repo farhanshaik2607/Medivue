@@ -99,16 +99,23 @@ export default function Checkout() {
                     {state.deliveryMode === 'delivery' && (
                         <div className="co-section">
                             <div className="co-section-title"><MapPin size={16} /> Delivery Address</div>
-                            <div className="co-address-card card card-body">
-                                <div className="co-addr-top">
-                                    <span className="co-addr-label">{state.selectedAddress.label}</span>
-                                    <button className="btn btn-sm btn-outline">Change</button>
+                            {state.selectedAddress ? (
+                                <div className="co-address-card card card-body">
+                                    <div className="co-addr-top">
+                                        <span className="co-addr-label">{state.selectedAddress.label}</span>
+                                        <button className="btn btn-sm btn-outline">Change</button>
+                                    </div>
+                                    <p className="co-addr-text">{state.selectedAddress.address}, {state.selectedAddress.city} - {state.selectedAddress.pin}</p>
                                 </div>
-                                <p className="co-addr-text">{state.selectedAddress.address}, {state.selectedAddress.city} - {state.selectedAddress.pin}</p>
-                            </div>
+                            ) : (
+                                <div className="co-address-card card card-body" style={{ textAlign: 'center' }}>
+                                    <p style={{ color: 'var(--gray-500)', marginBottom: '12px' }}>Please add an address in your profile to proceed with delivery.</p>
+                                    <button className="btn btn-outline" onClick={() => navigate('/profile')}>Add Address</button>
+                                </div>
+                            )}
                             <div className="co-saved-addresses">
                                 {state.user.addresses.map(addr => (
-                                    <button key={addr.id} className={`co-addr-chip ${state.selectedAddress.id === addr.id ? 'active' : ''}`}
+                                    <button key={addr.id} className={`co-addr-chip ${state.selectedAddress?.id === addr.id ? 'active' : ''}`}
                                         onClick={() => dispatch({ type: 'SET_SELECTED_ADDRESS', payload: addr })}>
                                         {addr.label}
                                     </button>

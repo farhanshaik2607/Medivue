@@ -6,10 +6,16 @@ import { medicines } from '../data/medicines';
 import './HealthProfile.css';
 
 export default function HealthProfile() {
-    const { state, handleLogout } = useApp();
+    const { state, handleLogout, dispatch } = useApp();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview'); // On mobile this controls view. On desktop, overview just means no specific tab selected if we want, but let's default to family on desktop or just keep overview as empty state.
     const user = state.user;
+
+    const [showFamilyForm, setShowFamilyForm] = useState(false);
+    const [newFamily, setNewFamily] = useState({ name: '', relation: '', age: '' });
+
+    const [showAddressForm, setShowAddressForm] = useState(false);
+    const [newAddress, setNewAddress] = useState({ label: 'Home', addressDetails: '', addressLine: '', city: '', pin: '' });
 
     if (!state.isLoggedIn) {
         return (
@@ -73,7 +79,6 @@ export default function HealthProfile() {
                     <div className="hp-hero">
                         <div className="hp-avatar">{user.name.charAt(0)}</div>
                         <h2 className="hp-name">{user.name}</h2>
-                        <p className="hp-phone">{user.phone}</p>
                         <p className="hp-email">{user.email}</p>
                     </div>
 
@@ -126,16 +131,16 @@ export default function HealthProfile() {
                                             <div className="hp-fm-avatar">{fm.name.charAt(0)}</div>
                                             <div>
                                                 <h4 className="hp-fm-name">{fm.name}</h4>
-                                                <p className="hp-fm-meta">{fm.relation} · {fm.age}y · {fm.gender} · {fm.bloodGroup}</p>
+                                                <p className="hp-fm-meta">{fm.relation}{fm.age ? ` · ${fm.age}y` : ''}</p>
                                             </div>
                                         </div>
-                                        {fm.allergies.length > 0 && (
+                                        {fm.allergies && fm.allergies.length > 0 && (
                                             <div className="hp-fm-allergies">
                                                 <AlertTriangle size={12} color="var(--warning)" />
                                                 <span>Allergies: {fm.allergies.join(', ')}</span>
                                             </div>
                                         )}
-                                        {fm.chronicMeds.length > 0 && (
+                                        {fm.chronicMeds && fm.chronicMeds.length > 0 && (
                                             <div className="hp-fm-chronic">
                                                 <Pill size={12} color="var(--primary)" />
                                                 <span>{fm.chronicMeds.length} chronic med{fm.chronicMeds.length > 1 ? 's' : ''}</span>
@@ -143,7 +148,28 @@ export default function HealthProfile() {
                                         )}
                                     </div>
                                 ))}
-                                <button className="btn btn-secondary btn-block" style={{ marginTop: '8px' }}>+ Add Family Member</button>
+                                {showFamilyForm ? (
+                                    <div className="card card-body" style={{ marginTop: '16px' }}>
+                                        <h4 style={{ marginBottom: '12px' }}>Add Family Member</h4>
+                                        <input autoFocus type="text" placeholder="Name" className="form-input" value={newFamily.name} onChange={e => setNewFamily({...newFamily, name: e.target.value})} style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }} />
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                                            <input type="text" placeholder="Relation" className="form-input" value={newFamily.relation} onChange={e => setNewFamily({...newFamily, relation: e.target.value})} style={{ flex: 1, minWidth: 0, boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }} />
+                                            <input type="number" placeholder="Age" className="form-input" value={newFamily.age} onChange={e => setNewFamily({...newFamily, age: e.target.value})} style={{ width: '80px', boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => {
+                                                if(newFamily.name && newFamily.relation && newFamily.age) {
+                                                    dispatch({ type: 'ADD_FAMILY_MEMBER', payload: { id: Date.now().toString(), name: newFamily.name, relation: newFamily.relation, age: newFamily.age } });
+                                                    setNewFamily({ name: '', relation: '', age: '' });
+                                                    setShowFamilyForm(false);
+                                                }
+                                            }}>Save</button>
+                                            <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setShowFamilyForm(false)}>Cancel</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button className="btn btn-secondary btn-block" style={{ marginTop: '8px' }} onClick={() => setShowFamilyForm(true)}>+ Add Family Member</button>
+                                )}
                             </div>
                         </div>
                     )}
@@ -166,6 +192,7 @@ export default function HealthProfile() {
                                         </div>
                                     ) : null;
                                 })}
+                                <button className="btn btn-secondary btn-block" style={{ marginTop: '8px' }} onClick={() => navigate('/search')}>+ Add Medicine</button>
                             </div>
                         </div>
                     )}
@@ -184,7 +211,15 @@ export default function HealthProfile() {
                                         </div>
                                     </div>
                                 ))}
-                                <button className="btn btn-secondary btn-block" style={{ marginTop: '8px' }}>+ Upload Document</button>
+                                <label className="btn btn-secondary btn-block" style={{ marginTop: '8px', display: 'flex', justifyContent: 'center', cursor: 'pointer' }}>
+                                    + Upload Document
+                                    <input type="file" style={{ display: 'none' }} onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                            const file = e.target.files[0];
+                                            dispatch({ type: 'ADD_DOCUMENT', payload: { id: Date.now().toString(), name: file.name, type: 'Document', date: new Date().toISOString().split('T')[0], size: (file.size / 1024 / 1024).toFixed(2) + ' MB' } });
+                                        }
+                                    }} />
+                                </label>
                             </div>
                         </div>
                     )}
@@ -203,6 +238,34 @@ export default function HealthProfile() {
                                         <p className="hp-addr-text">{addr.address}, {addr.city} - {addr.pin}</p>
                                     </div>
                                 ))}
+                                {showAddressForm ? (
+                                    <div className="card card-body" style={{ marginTop: '16px' }}>
+                                        <h4 style={{ marginBottom: '12px' }}>Add New Address</h4>
+                                        <select value={newAddress.label} onChange={e => setNewAddress({...newAddress, label: e.target.value})} style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }}>
+                                            <option value="Home">Home</option>
+                                            <option value="Office">Office</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <input type="text" placeholder="House/Flat No, Building Name" value={newAddress.addressDetails} onChange={e => setNewAddress({...newAddress, addressDetails: e.target.value})} style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }} />
+                                        <input type="text" placeholder="Full Address Line & Area" value={newAddress.addressLine} onChange={e => setNewAddress({...newAddress, addressLine: e.target.value})} style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }} />
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                                            <input type="text" placeholder="City" value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} style={{ flex: 1, minWidth: 0, boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }} />
+                                            <input type="text" placeholder="Pincode" value={newAddress.pin} onChange={e => setNewAddress({...newAddress, pin: e.target.value})} style={{ flex: 1, minWidth: 0, boxSizing: 'border-box', padding: '10px', border: '1px solid var(--gray-300)', borderRadius: '8px' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => {
+                                                if(newAddress.addressLine && newAddress.city && newAddress.pin) {
+                                                    dispatch({ type: 'ADD_ADDRESS', payload: { id: Date.now().toString(), label: newAddress.label, address: (newAddress.addressDetails ? newAddress.addressDetails + ', ' : '') + newAddress.addressLine, city: newAddress.city, pin: newAddress.pin, isDefault: user.addresses.length === 0, lat: 12.9716, lng: 77.7500 } });
+                                                    setNewAddress({ label: 'Home', addressLine: '', addressDetails: '', city: '', pin: '' });
+                                                    setShowAddressForm(false);
+                                                }
+                                            }}>Save</button>
+                                            <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setShowAddressForm(false)}>Cancel</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button className="btn btn-secondary btn-block" style={{ marginTop: '8px' }} onClick={() => setShowAddressForm(true)}>+ Add Address</button>
+                                )}
                             </div>
                         </div>
                     )}

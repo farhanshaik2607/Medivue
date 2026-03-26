@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, AlertTriangle, Clock, Users, Plus, ClipboardList, Settings, LogOut, Bell, TrendingUp, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { Package, AlertTriangle, Clock, Users, Plus, ClipboardList, Settings, User, Bell, TrendingUp, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getPharmacyProfile, subscribeToInventory } from '../services/firestoreService';
 import './PharmacyDashboard.css';
@@ -43,10 +43,7 @@ export default function PharmacyDashboard() {
         return exp <= thirtyDaysFromNow;
     });
 
-    const doLogout = async () => {
-        await handleLogout();
-        navigate('/role-select');
-    };
+
 
     return (
         <div className="pd-page">
@@ -62,9 +59,6 @@ export default function PharmacyDashboard() {
                 <div className="pd-header-actions">
                     <button className="pd-icon-btn" onClick={() => navigate('/pharmacy-requests')}>
                         <Bell size={20} />
-                    </button>
-                    <button className="pd-icon-btn pd-logout" onClick={doLogout}>
-                        <LogOut size={20} />
                     </button>
                 </div>
             </div>
@@ -185,9 +179,9 @@ export default function PharmacyDashboard() {
                     <ShoppingBag size={20} />
                     <span>Orders</span>
                 </button>
-                <button className="pd-nav-item" onClick={doLogout}>
-                    <LogOut size={20} />
-                    <span>Logout</span>
+                <button className="pd-nav-item" onClick={() => navigate('/pharmacy-owner-profile')}>
+                    <User size={20} />
+                    <span>Profile</span>
                 </button>
             </nav>
         </div>

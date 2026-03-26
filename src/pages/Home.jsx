@@ -42,7 +42,7 @@ export default function Home() {
                             <div className="banner-content">
                                 <h3 className="banner-title">{banner.title}</h3>
                                 <p className="banner-subtitle">{banner.subtitle}</p>
-                                <button className="banner-cta">{banner.cta} <ChevronRight size={14} /></button>
+                                <button className="banner-cta" onClick={() => navigate(banner.path || '/search')}>{banner.cta} <ChevronRight size={14} /></button>
                             </div>
                             <div className="banner-graphic">
                                 {banner.id === 1 && '🎉'}

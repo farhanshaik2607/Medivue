@@ -7,10 +7,10 @@ export const offers = [
 ];
 
 export const banners = [
-    { id: 1, title: 'Flat 50% OFF', subtitle: 'On First Order', cta: 'Order Now', gradient: 'linear-gradient(135deg, #0F847E 0%, #14B8A6 100%)', textColor: '#fff' },
-    { id: 2, title: 'Upload Prescription', subtitle: 'Get medicines delivered', cta: 'Upload Now', gradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)', textColor: '#fff' },
-    { id: 3, title: 'Health Checkup Packages', subtitle: 'Starting at ₹299', cta: 'Book Now', gradient: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)', textColor: '#fff' },
-    { id: 4, title: 'Free Delivery', subtitle: 'On orders above ₹149', cta: 'Shop Now', gradient: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)', textColor: '#fff' },
+    { id: 1, title: 'Flat 50% OFF', subtitle: 'On First Order', cta: 'Order Now', path: '/offers', gradient: 'linear-gradient(135deg, #0F847E 0%, #14B8A6 100%)', textColor: '#fff' },
+    { id: 2, title: 'Upload Prescription', subtitle: 'Get medicines delivered', cta: 'Upload Now', path: '/upload-prescription', gradient: 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)', textColor: '#fff' },
+    { id: 3, title: 'Health Checkup Packages', subtitle: 'Starting at ₹299', cta: 'Book Now', path: '/search', gradient: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)', textColor: '#fff' },
+    { id: 4, title: 'Free Delivery', subtitle: 'On orders above ₹149', cta: 'Shop Now', path: '/search', gradient: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)', textColor: '#fff' },
 ];
 
 export const notifications = [

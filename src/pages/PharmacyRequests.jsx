@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Clock, AlertTriangle, CheckCircle, XCircle, Package, TrendingUp, ClipboardList, LogOut, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, AlertTriangle, CheckCircle, XCircle, Package, TrendingUp, ClipboardList, User, ShoppingBag, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { subscribeToPharmacyRequests, acceptMedicineRequest, rejectMedicineRequest, getPharmacyProfile } from '../services/firestoreService';
 import './PharmacyRequests.css';
@@ -71,7 +71,7 @@ export default function PharmacyRequests() {
         return true;
     });
 
-    const doLogout = async () => { await handleLogout(); navigate('/role-select'); };
+
 
     return (
         <div className="pr-page">
@@ -178,8 +178,11 @@ export default function PharmacyRequests() {
                 <button className="pd-nav-item active" onClick={() => navigate('/pharmacy-requests')}>
                     <ClipboardList size={20} /><span>Requests</span>
                 </button>
-                <button className="pd-nav-item" onClick={doLogout}>
-                    <LogOut size={20} /><span>Logout</span>
+                <button className="pd-nav-item" onClick={() => navigate('/pharmacy-orders')}>
+                    <ShoppingBag size={20} /><span>Orders</span>
+                </button>
+                <button className="pd-nav-item" onClick={() => navigate('/pharmacy-owner-profile')}>
+                    <User size={20} /><span>Profile</span>
                 </button>
             </nav>
         </div>
