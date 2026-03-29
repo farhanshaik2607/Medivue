@@ -47,8 +47,8 @@ export const categories = [
 export const popularSearches = ['Dolo 650', 'Paracetamol', 'Azithromycin', 'Combiflam', 'Pan 40', 'Vitamin D', 'Cetirizine', 'Metformin'];
 
 export const healthArticles = [
-  { id: 1, title: 'Understanding Antibiotic Resistance', excerpt: 'Learn why completing your antibiotic course is crucial...', category: 'Health Tips', readTime: '3 min', color: '#3B82F6' },
-  { id: 2, title: 'Managing Diabetes at Home', excerpt: 'Simple diet and lifestyle changes that make a big difference...', category: 'Wellness', readTime: '5 min', color: '#22C55E' },
-  { id: 3, title: 'Monsoon Health Essentials', excerpt: 'Stock up on these medicines to stay healthy this season...', category: 'Seasonal', readTime: '4 min', color: '#F59E0B' },
-  { id: 4, title: 'Vitamin D: The Sunshine Vitamin', excerpt: 'Why most Indians are deficient and what to do about it...', category: 'Nutrition', readTime: '4 min', color: '#8B5CF6' },
+  { id: 1, title: 'Stay Hydrated', excerpt: 'Drink at least 8 glasses of water daily. Proper hydration improves skin health, boosts energy, and aids digestion.', icon: '💧', color: '#0EA5E9' },
+  { id: 2, title: 'Prioritize Sleep', excerpt: 'Aim for 7-8 hours of uninterrupted sleep every night to allow your body and mind to recover and strengthen immunity.', icon: '🌙', color: '#8B5CF6' },
+  { id: 3, title: 'Daily Movement', excerpt: 'Incorporate at least 30 minutes of moderate physical activity into your daily routine to maintain a healthy heart and weight.', icon: '🏃‍♂️', color: '#10B981' },
+  { id: 4, title: 'Balanced Diet', excerpt: 'Ensure your meals include a rich variety of proteins, fruits, vegetables, and whole grains for optimal daily nutrition.', icon: '🥗', color: '#F59E0B' },
 ];

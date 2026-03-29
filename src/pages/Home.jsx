@@ -23,7 +23,7 @@ export default function Home() {
 
     return (
         <div className="page home-page">
-            {/* Search Bar */}
+            {/* Search Bar - navigates to full search page */}
             <div className="home-search-wrap" onClick={() => navigate('/search')}>
                 <div className="home-search" id="home-search-bar">
                     <Search size={18} className="home-search-icon" />
@@ -170,13 +170,14 @@ export default function Home() {
             </div>
             <div className="scroll-row">
                 {healthArticles.map(article => (
-                    <div key={article.id} className="article-card card">
-                        <div className="article-header" style={{ background: article.color + '15' }}>
-                            <span className="article-cat" style={{ color: article.color }}>{article.category}</span>
-                            <span className="article-time">{article.readTime} read</span>
-                        </div>
-                        <div className="card-body">
+                    <div key={article.id} className="article-card card" style={{ borderTop: `4px solid ${article.color}` }}>
+                        <div className="article-header">
+                            <div className="tip-icon-wrap" style={{ background: article.color + '15', color: article.color }}>
+                                {article.icon}
+                            </div>
                             <h4 className="article-title">{article.title}</h4>
+                        </div>
+                        <div className="card-body" style={{ paddingTop: '8px', paddingBottom: '20px' }}>
                             <p className="article-excerpt">{article.excerpt}</p>
                         </div>
                     </div>

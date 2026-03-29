@@ -31,6 +31,7 @@ export default function Checkout() {
 
         try {
             // Create an order doc for each pharmacy
+            const createdOrderIds = [];
             for (const [phId, items] of Object.entries(grouped)) {
                 const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
                 const isDelivery = state.deliveryMode === 'delivery';
@@ -43,7 +44,7 @@ export default function Checkout() {
                     fee = subtotal >= 299 ? 0 : 30; // fallback
                 }
 
-                await createOrder({
+                const orderId = await createOrder({
                     userId: state.user.uid,
                     userName: state.user.displayName || 'Customer',
                     userPhone: state.user.phoneNumber || null,
@@ -57,12 +58,17 @@ export default function Checkout() {
                     deliveryMode: state.deliveryMode,
                     deliveryAddress: isDelivery ? (state.selectedAddress || null) : null,
                 });
+                createdOrderIds.push(orderId);
             }
 
             setOrderPlaced(true);
             setTimeout(() => {
                 dispatch({ type: 'CLEAR_CART' });
-                navigate('/order-tracking');
+                if (createdOrderIds.length === 1) {
+                    navigate(`/order-tracking/${createdOrderIds[0]}`);
+                } else {
+                    navigate('/orders');
+                }
             }, 2000);
             
         } catch (error) {

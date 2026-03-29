@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, ChevronDown, Bell, Search, ShoppingCart, User, Gift, ClipboardList, Moon, Sun } from 'lucide-react';
+import { MapPin, ChevronDown, Bell, Search, ShoppingCart, User, Gift, ClipboardList, Moon, Sun, Activity } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { notifications } from '../../data/offers';
 import './TopHeader.css';
@@ -44,14 +44,7 @@ export default function TopHeader() {
                     </div>
                 </div>
 
-                {/* Desktop Center: Search */}
-                <div className="desktop-center desktop-only">
-                    <div className="header-search" onClick={() => navigate('/search')}>
-                        <Search size={18} color="var(--gray-400)" />
-                        <input type="text" placeholder="Search for medicines, brands and more..." readOnly />
-                        <button className="header-search-btn">Search</button>
-                    </div>
-                </div>
+
 
                 {/* Mobile Right: Notifications & Theme */}
                 <div className="top-header-actions mobile-only">
@@ -71,6 +64,9 @@ export default function TopHeader() {
                     </button>
                     <button className="d-nav-item" onClick={() => navigate('/offers')}>
                         <Gift size={20} /> <span className="d-nav-text">Offers</span>
+                    </button>
+                    <button className="d-nav-item" onClick={() => navigate('/my-requests')}>
+                        <Activity size={20} /> <span className="d-nav-text">Requests</span>
                     </button>
                     <button className="d-nav-item" onClick={() => navigate('/orders')}>
                         <ClipboardList size={20} /> <span className="d-nav-text">Orders</span>

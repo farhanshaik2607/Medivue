@@ -5,16 +5,19 @@ import { useApp } from '../context/AppContext';
 import { subscribeToUserRequests } from '../services/firestoreService';
 import './MyRequests.css';
 
-const STATUS_STEPS = [
-    { key: 'requested', label: 'Requested', icon: Clock },
-    { key: 'accepted', label: 'Accepted', icon: CheckCircle },
-    { key: 'preparing', label: 'Preparing', icon: Package },
-    { key: 'ready', label: 'Ready for Pickup', icon: Store },
-    { key: 'completed', label: 'Completed', icon: CheckCircle },
-];
+const getStatusSteps = (deliveryOption) => {
+    const isDelivery = deliveryOption === 'delivery';
+    return [
+        { key: 'requested', label: 'Requested', icon: Clock },
+        { key: 'accepted', label: 'Accepted', icon: CheckCircle },
+        { key: 'preparing', label: 'Preparing', icon: Package },
+        { key: 'ready', label: isDelivery ? 'Out for Delivery' : 'Ready for Pickup', icon: isDelivery ? Truck : Store },
+        { key: 'completed', label: 'Completed', icon: CheckCircle },
+    ];
+};
 
-function getStepIndex(status) {
-    const idx = STATUS_STEPS.findIndex(s => s.key === status);
+function getStepIndex(status, steps) {
+    const idx = steps.findIndex(s => s.key === status);
     return idx >= 0 ? idx : 0;
 }
 
@@ -61,7 +64,8 @@ export default function MyRequests() {
                 )}
 
                 {requests.map(req => {
-                    const currentStep = getStepIndex(req.status);
+                    const steps = getStatusSteps(req.deliveryOption);
+                    const currentStep = getStepIndex(req.status, steps);
                     const createdAt = req.createdAt?.toDate ? req.createdAt.toDate() : new Date();
 
                     return (
@@ -92,7 +96,7 @@ export default function MyRequests() {
 
                             {/* Status Stepper */}
                             <div className="mr-stepper">
-                                {STATUS_STEPS.map((step, i) => {
+                                {steps.map((step, i) => {
                                     const StepIcon = step.icon;
                                     const isDone = i <= currentStep;
                                     const isCurrent = i === currentStep;

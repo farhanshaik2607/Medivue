@@ -92,7 +92,7 @@ function AppLayout() {
         <Route path="/pharmacy/:id" element={<PharmacyProfile />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-tracking" element={<OrderTracking />} />
+        <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
         <Route path="/orders" element={<OrderHistory />} />
         <Route path="/upload-prescription" element={<UploadPrescription />} />
         <Route path="/notifications" element={<Notifications />} />

@@ -74,8 +74,8 @@ export default function OrderHistory() {
                                     <button className="btn btn-sm btn-primary" onClick={(e) => { e.stopPropagation(); navigate('/search'); }}>
                                         <RotateCcw size={12} /> Reorder
                                     </button>
-                                    {(order.status === 'ready' || order.status === 'accepted') && (
-                                        <button className="btn btn-sm btn-accent" onClick={(e) => { e.stopPropagation(); navigate('/order-tracking'); }}>
+                                    {(order.status === 'pending' || order.status === 'ready' || order.status === 'accepted') && (
+                                        <button className="btn btn-sm btn-accent" onClick={(e) => { e.stopPropagation(); navigate(`/order-tracking/${order.id}`); }}>
                                             Track <ChevronRight size={12} />
                                         </button>
                                     )}

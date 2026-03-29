@@ -1,12 +1,35 @@
+/* ============================================
+   Order Tracking Page — Premium Redesign
+   ============================================ */
+
 .ot-page {
     background: var(--gray-50);
+    min-height: 100vh;
 }
 
+.ot-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 12px;
+    text-align: center;
+    color: var(--gray-500);
+}
+
+.ot-loading h3 {
+    font-family: var(--font-heading);
+    color: var(--gray-800);
+    margin-top: 8px;
+}
+
+/* Header */
 .ot-header {
     display: flex;
     align-items: center;
     gap: var(--sp-3);
-    padding: var(--sp-3) var(--sp-4);
+    padding: var(--sp-4) var(--sp-4);
     background: var(--white);
     border-bottom: 1px solid var(--gray-100);
     position: sticky;
@@ -14,242 +37,225 @@
     z-index: 50;
 }
 
+.ot-back-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--gray-600);
+    transition: background 0.15s;
+}
+
+.ot-back-btn:hover {
+    background: var(--gray-100);
+}
+
+.ot-header-center {
+    flex: 1;
+}
+
 .ot-title {
     font-family: var(--font-heading);
     font-size: var(--text-lg);
-    font-weight: 600;
-    flex: 1;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.2;
 }
 
 .ot-order-id {
     font-size: var(--text-xs);
     color: var(--gray-400);
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
-.ot-map {
-    height: 200px;
-    background: linear-gradient(135deg, #E6F7F6 0%, #D4F1EF 50%, #A8E3DE 100%);
+.ot-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--success-light);
+    color: var(--success);
+    animation: pulse-live 2s ease-in-out infinite;
+}
+
+.ot-live-badge.rejected {
+    background: var(--danger-light);
+    color: var(--danger);
+    animation: none;
+}
+
+@keyframes pulse-live {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Content */
+.ot-content {
+    padding: var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+}
+
+/* Status Hero */
+.ot-status-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: var(--radius-xl);
+    padding: var(--sp-8) var(--sp-6);
+    text-align: center;
+    color: #FFFFFF;
     position: relative;
     overflow: hidden;
 }
 
-.ot-map-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    height: 100%;
-    padding: 0 40px;
-}
-
-.ot-map-pin {
-    font-size: 28px;
-    z-index: 2;
-    position: relative;
-}
-
-.ot-map-pin.driver {
-    animation: bounce 1s ease-in-out infinite;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-8px);
-    }
-}
-
-.ot-map-route {
-    flex: 1;
-    height: 3px;
-    background: var(--primary);
-    border-radius: 2px;
-    position: relative;
-}
-
-.ot-map-route::after {
+.ot-status-hero::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 60%;
-    background: var(--primary-dark);
-    border-radius: 2px;
-    animation: progress 2s ease-in-out infinite;
+    top: -50%;
+    right: -30%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
 }
 
-@keyframes progress {
-    0% {
-        width: 30%;
-    }
-
-    50% {
-        width: 70%;
-    }
-
-    100% {
-        width: 30%;
-    }
-}
-
-.ot-eta-badge {
+.ot-status-hero::after {
+    content: '';
     position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: var(--radius-full);
-    background: var(--white);
-    color: var(--gray-800);
+    bottom: -40%;
+    left: -20%;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+}
+
+.ot-status-hero.rejected {
+    background: linear-gradient(135deg, var(--danger) 0%, #DC2626 100%);
+}
+
+.ot-status-hero-icon {
+    margin-bottom: var(--sp-3);
+    position: relative;
+    z-index: 1;
+}
+
+.ot-status-hero-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+}
+
+.ot-status-hero-desc {
     font-size: var(--text-sm);
-    font-weight: 600;
-    box-shadow: var(--shadow-md);
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
 }
 
-@keyframes pulse-badge {
-
-    0%,
-    100% {
-        box-shadow: 0 4px 12px rgba(15, 132, 126, 0.15);
-    }
-
-    50% {
-        box-shadow: 0 4px 20px rgba(15, 132, 126, 0.3);
-    }
+/* Progress Bar */
+.ot-progress-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-6) var(--sp-4);
+    border: 1px solid var(--gray-100);
 }
 
-.animate-pulse-badge {
-    animation: pulse-badge 2s ease-in-out infinite;
+.ot-progress-bar {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--sp-5);
 }
 
-.ot-driver-card {
-    margin: var(--sp-4);
-    padding: var(--sp-4);
+.ot-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--success));
+    border-radius: var(--radius-full);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.ot-progress-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(34,197,94,0.5);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 4px rgba(34,197,94,0.3); }
+    50% { box-shadow: 0 0 12px rgba(34,197,94,0.6); }
+}
+
+.ot-progress-labels {
     display: flex;
-    align-items: center;
     justify-content: space-between;
 }
 
-.ot-driver-info {
+.ot-progress-label {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--sp-3);
+    gap: 6px;
+    flex: 1;
 }
 
-.ot-driver-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--primary-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-}
-
-.ot-driver-name {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--gray-800);
-}
-
-.ot-driver-vehicle {
-    font-size: 11px;
-    color: var(--gray-500);
-}
-
-.ot-driver-actions {
-    display: flex;
-    gap: var(--sp-2);
-}
-
-.ot-action-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.ot-action-btn.call {
-    background: var(--success-light);
-    color: var(--success);
-}
-
-.ot-action-btn.call:hover {
-    background: var(--success);
-    color: var(--white);
-}
-
-.ot-action-btn.chat {
-    background: var(--info-light);
-    color: var(--info);
-}
-
-.ot-action-btn.chat:hover {
-    background: var(--info);
-    color: var(--white);
-}
-
-.ot-timeline {
-    background: var(--white);
-    padding: var(--sp-4);
-    margin: 0 var(--sp-4) var(--sp-3);
-    border-radius: var(--radius-lg);
-}
-
-.ot-timeline-title {
-    font-family: var(--font-heading);
-    font-size: var(--text-base);
-    font-weight: 600;
-    margin-bottom: var(--sp-4);
-}
-
-.ot-step {
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    gap: var(--sp-3);
-    padding-bottom: var(--sp-5);
-    padding-left: 4px;
-}
-
-.ot-step:last-child {
-    padding-bottom: 0;
-}
-
-.ot-step-dot {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gray-200);
+.ot-progress-label span {
+    font-size: 10px;
+    font-weight: 500;
     color: var(--gray-400);
-    flex-shrink: 0;
-    z-index: 2;
-    border: 2px solid var(--white);
+    text-align: center;
+    line-height: 1.2;
 }
 
-.ot-step.done .ot-step-dot {
+.ot-progress-label.active span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.ot-progress-label.current span {
+    color: var(--success);
+    font-weight: 700;
+}
+
+.ot-progress-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+}
+
+.ot-progress-label.active .ot-progress-dot {
     background: var(--primary);
-    color: var(--white);
+    color: #FFFFFF;
 }
 
-.ot-step.current .ot-step-dot {
-    background: var(--accent);
-    color: var(--white);
+.ot-progress-label.current .ot-progress-dot {
+    background: var(--success);
+    color: #FFFFFF;
     animation: pulse 1.5s ease-in-out infinite;
 }
 
@@ -260,90 +266,262 @@
     background: currentColor;
 }
 
-.ot-step-line {
-    position: absolute;
-    left: 14px;
-    top: 26px;
-    width: 2px;
-    height: calc(100% - 26px);
-    background: var(--gray-200);
-}
-
-.ot-step-line.done {
-    background: var(--primary);
-}
-
-.ot-step-info {
-    flex: 1;
-}
-
-.ot-step-label {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--gray-700);
-    display: block;
-}
-
-.ot-step.done .ot-step-label {
-    color: var(--gray-800);
-    font-weight: 600;
-}
-
-.ot-step-time {
-    font-size: 11px;
-    color: var(--gray-400);
-}
-
-.ot-proof {
+/* Timeline Card */
+.ot-timeline-card {
     background: var(--white);
-    padding: var(--sp-4);
-    margin: 0 var(--sp-4);
     border-radius: var(--radius-lg);
-    text-align: center;
+    padding: var(--sp-4);
+    border: 1px solid var(--gray-100);
 }
 
-.ot-proof h3 {
+.ot-section-title {
     font-family: var(--font-heading);
     font-size: var(--text-base);
     font-weight: 600;
-    margin-bottom: 4px;
+    color: var(--gray-900);
+    margin-bottom: var(--sp-4);
 }
 
+.ot-timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.ot-tl-step {
+    display: flex;
+    gap: var(--sp-3);
+    min-height: 56px;
+}
+
+.ot-tl-dot-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 24px;
+    flex-shrink: 0;
+}
+
+.ot-tl-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    flex-shrink: 0;
+    border: 2px solid var(--white);
+    transition: all 0.3s ease;
+}
+
+.ot-tl-step.done .ot-tl-dot {
+    background: var(--primary);
+    color: #FFFFFF;
+}
+
+.ot-tl-step.current .ot-tl-dot {
+    background: var(--success);
+    color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(34,197,94,0.2);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.ot-tl-step.rejected .ot-tl-dot.rejected {
+    background: var(--danger);
+    color: #FFFFFF;
+}
+
+.ot-tl-dot-inner {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.ot-tl-line {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+    background: var(--gray-200);
+    margin: 4px 0;
+    transition: background 0.3s ease;
+}
+
+.ot-tl-line.done {
+    background: var(--primary);
+}
+
+.ot-tl-content {
+    padding-bottom: var(--sp-4);
+    flex: 1;
+}
+
+.ot-tl-label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 2px;
+}
+
+.ot-tl-step.done .ot-tl-label {
+    color: var(--gray-900);
+}
+
+.ot-tl-step.current .ot-tl-label {
+    color: var(--success);
+}
+
+.ot-tl-desc {
+    font-size: 11px;
+    color: var(--gray-400);
+    line-height: 1.4;
+}
+
+/* Details Card */
+.ot-details-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4);
+    border: 1px solid var(--gray-100);
+}
+
+.ot-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--gray-50);
+}
+
+.ot-detail-row:last-child {
+    border-bottom: none;
+}
+
+.ot-detail-label {
+    font-size: var(--text-sm);
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ot-detail-value {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-800);
+    text-align: right;
+}
+
+.ot-address {
+    max-width: 200px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* Items Card */
+.ot-items-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4);
+    border: 1px solid var(--gray-100);
+}
+
+.ot-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ot-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--gray-50);
+}
+
+.ot-item-row:last-child {
+    border-bottom: none;
+}
+
+.ot-item-info {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+.ot-item-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+.ot-item-qty {
+    font-size: var(--text-xs);
+    color: var(--gray-400);
+    font-weight: 500;
+}
+
+.ot-item-price {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.ot-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--sp-3);
+    margin-top: var(--sp-2);
+    border-top: 2px solid var(--gray-200);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.ot-total-price {
+    font-size: var(--text-xl);
+    color: var(--primary);
+}
+
+/* Actions */
+.ot-actions {
+    padding-bottom: var(--sp-4);
+}
+
+/* Desktop */
 @media (min-width: 768px) {
     .ot-page {
         padding-top: var(--header-height);
-        max-width: 800px;
-        margin: var(--sp-6) auto var(--sp-8);
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-xl);
-        background: var(--gray-50);
-        box-shadow: var(--shadow-sm);
-        padding-bottom: var(--sp-6);
-        overflow: hidden;
+    }
+
+    .ot-content {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: var(--sp-6);
+        gap: var(--sp-5);
     }
 
     .ot-header {
         position: static;
-        padding: var(--sp-6);
-        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        padding: var(--sp-5) var(--sp-6);
     }
 
-    .ot-map {
-        border-radius: var(--radius-lg);
-        margin: 0 var(--sp-6);
+    .ot-status-hero {
+        padding: var(--sp-10) var(--sp-8);
     }
+}
 
-    .ot-driver-card {
-        margin: var(--sp-6);
-        background: var(--white);
-        border-radius: var(--radius-lg);
-    }
-
-    .ot-timeline {
-        margin: 0 var(--sp-6) var(--sp-6);
-    }
-
-    .ot-proof {
-        margin: 0 var(--sp-6);
-    }
+/* Spin animation */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.spin {
+    animation: spin 1s linear infinite;
 }

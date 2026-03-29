@@ -17,6 +17,7 @@ export default function MedicineDetail() {
     const [isSignaled, setIsSignaled] = useState(false);
     const [med, setMed] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedPharmacyId, setSelectedPharmacyId] = useState(null);
 
     // Fetch medicine data (local or API)
     useEffect(() => {
@@ -102,6 +103,7 @@ export default function MedicineDetail() {
         ? med.substitutes.map(sid => medicines.find(m => m.id === sid)).filter(Boolean)
         : [];
     const cheapest = nearbyPharmacies[0];
+    const selectedPharmacy = nearbyPharmacies.find(p => p.id === selectedPharmacyId) || cheapest;
 
     const handleSignalStores = async () => {
         if (!state.user || !state.user.uid) {
@@ -393,21 +395,37 @@ export default function MedicineDetail() {
                             <h3>Best Price Near You</h3>
                             {nearbyPharmacies.length > 0 && <span className="badge badge-success">{nearbyPharmacies.length} stores</span>}
                         </div>
-                        {cheapest ? (
-                            <div className="md-best-price card">
-                                <div className="md-bp-left">
-                                    <span className="md-bp-pharmacy">{cheapest.name}</span>
-                                    <span className="md-bp-distance"><MapPin size={12} /> {cheapest.distance} km · {cheapest.walkTime} min walk</span>
-                                </div>
-                                <div className="md-bp-right">
-                                    <span className="price" style={{ fontSize: '20px' }}>₹{cheapest.medPrice}</span>
-                                    {cheapest.medPrice < med.mrp && (
-                                        <div>
-                                            <span className="price-original">MRP ₹{med.mrp}</span>
-                                            <span className="price-discount"> {Math.round((1 - cheapest.medPrice / med.mrp) * 100)}% off</span>
+                        {nearbyPharmacies.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '400px', overflowY: 'auto', padding: '2px' }}>
+                                {nearbyPharmacies.map((ph, idx) => (
+                                    <div 
+                                        key={ph.id} 
+                                        className={`md-best-price card ${selectedPharmacy?.id === ph.id ? 'selected' : ''}`}
+                                        onClick={() => setSelectedPharmacyId(ph.id)}
+                                        style={{ 
+                                            cursor: 'pointer', 
+                                            border: selectedPharmacy?.id === ph.id ? '2px solid var(--primary)' : '1px solid var(--gray-200)',
+                                            background: selectedPharmacy?.id === ph.id ? 'var(--primary-50)' : 'var(--white)'
+                                        }}
+                                    >
+                                        <div className="md-bp-left">
+                                            <span className="md-bp-pharmacy" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                                                {ph.name}
+                                                {idx === 0 && <span className="badge badge-success" style={{ fontSize: '9px', padding: '2px 6px' }}>Best Price</span>}
+                                            </span>
+                                            <span className="md-bp-distance"><MapPin size={12} /> {ph.distance} km · {ph.walkTime} min walk</span>
                                         </div>
-                                    )}
-                                </div>
+                                        <div className="md-bp-right">
+                                            <span className="price" style={{ fontSize: '20px' }}>₹{ph.medPrice}</span>
+                                            {ph.medPrice < med.mrp && (
+                                                <div>
+                                                    <span className="price-original">MRP ₹{med.mrp}</span>
+                                                    <span className="price-discount"> {Math.round((1 - ph.medPrice / med.mrp) * 100)}% off</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         ) : (
                             <div className="md-no-stock card card-body">
@@ -438,13 +456,13 @@ export default function MedicineDetail() {
                     </div>
 
                     {/* Desktop Add to Cart */}
-                    {cheapest && (
+                    {selectedPharmacy && (
                         <div className="md-desktop-cta desktop-only card card-body">
-                            <span className="price" style={{ fontSize: '28px' }}>₹{cheapest.medPrice}</span>
-                            {cheapest.medPrice < med.mrp && <span className="text-sm" style={{ color: 'var(--success)', fontWeight: 600 }}>You save ₹{med.mrp - cheapest.medPrice}</span>}
-                            <span className="text-xs" style={{ color: 'var(--gray-500)', marginBottom: 'var(--sp-4)', display: 'block' }}>Sold by {cheapest.name}</span>
+                            <span className="price" style={{ fontSize: '28px' }}>₹{selectedPharmacy.medPrice}</span>
+                            {selectedPharmacy.medPrice < med.mrp && <span className="text-sm" style={{ color: 'var(--success)', fontWeight: 600 }}>You save ₹{med.mrp - selectedPharmacy.medPrice}</span>}
+                            <span className="text-xs" style={{ color: 'var(--gray-500)', marginBottom: 'var(--sp-4)', display: 'block' }}>Sold by {selectedPharmacy.name}</span>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                                <button className="btn btn-primary btn-lg" style={{ flex: 1 }} onClick={() => addToCart(med.id, cheapest.id, med.name, cheapest.medPrice)}>
+                                <button className="btn btn-primary btn-lg" style={{ flex: 1 }} onClick={() => addToCart(med.id, selectedPharmacy.id, med.name, selectedPharmacy.medPrice)}>
                                     <ShoppingBag size={18} /> Add to Cart
                                 </button>
                                 <button className={`btn btn-lg ${isSaved ? 'btn-secondary' : 'btn-outline'}`} onClick={() => dispatch({ type: 'TOGGLE_SAVED_MED', payload: med.id })}>
@@ -460,17 +478,17 @@ export default function MedicineDetail() {
             </div>
 
             {/* Mobile Bottom CTA */}
-            {cheapest && (
+            {selectedPharmacy && (
                 <div className="md-bottom-cta mobile-only">
                     <div className="md-cta-price">
-                        <span className="price" style={{ fontSize: '18px' }}>₹{cheapest.medPrice}</span>
-                        <span className="text-xs">{cheapest.name}</span>
+                        <span className="price" style={{ fontSize: '18px' }}>₹{selectedPharmacy.medPrice}</span>
+                        <span className="text-xs">{selectedPharmacy.name}</span>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <button className={`btn btn-lg ${isSaved ? 'btn-secondary' : 'btn-outline'}`} style={{ padding: '0 16px' }} onClick={() => dispatch({ type: 'TOGGLE_SAVED_MED', payload: med.id })}>
                             <Heart size={20} fill={isSaved ? '#EF4444' : 'none'} color={isSaved ? '#EF4444' : 'currentColor'} />
                         </button>
-                        <button className="btn btn-primary btn-lg" style={{ flex: 1 }} onClick={() => addToCart(med.id, cheapest.id, med.name, cheapest.medPrice)}>
+                        <button className="btn btn-primary btn-lg" style={{ flex: 1 }} onClick={() => addToCart(med.id, selectedPharmacy.id, med.name, selectedPharmacy.medPrice)}>
                             Add to Cart
                         </button>
                     </div>

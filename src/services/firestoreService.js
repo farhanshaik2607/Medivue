@@ -151,11 +151,16 @@ export async function createMedicineRequest(data) {
 export function subscribeToUserRequests(userId, callback) {
     const q = query(
         collection(db, 'requests'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', userId)
     );
     return onSnapshot(q, (snapshot) => {
         const requests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Sort in memory to avoid missing index errors
+        requests.sort((a, b) => {
+            const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+            const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+            return timeB - timeA;
+        });
         callback(requests);
     });
 }
@@ -267,6 +272,16 @@ export function subscribeToPharmacyOrders(pharmacyId, callback) {
 
 export async function updateOrderStatus(orderId, status) {
     await updateDoc(doc(db, 'orders', orderId), { status });
+}
+
+export function subscribeToOrder(orderId, callback) {
+    return onSnapshot(doc(db, 'orders', orderId), (snapshot) => {
+        if (snapshot.exists()) {
+            callback({ id: snapshot.id, ...snapshot.data() });
+        } else {
+            callback(null);
+        }
+    });
 }
 
 // ==================== FILE UPLOAD ====================

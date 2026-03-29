@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, AlertTriangle, Clock, Users, Plus, ClipboardList, Settings, User, Bell, TrendingUp, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { Package, AlertTriangle, Clock, Users, Plus, ClipboardList, Settings, User, Bell, TrendingUp, ShieldCheck, ShoppingBag, MapPin, ChevronDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { getPharmacyProfile, subscribeToInventory } from '../services/firestoreService';
+import { getPharmacyProfile, subscribeToInventory, subscribeToPharmacyOrders, updateOrderStatus } from '../services/firestoreService';
 import './PharmacyDashboard.css';
 
 export default function PharmacyDashboard() {
-    const { state, handleLogout } = useApp();
+    const { state, handleLogout, fetchLocation } = useApp();
     const navigate = useNavigate();
     const [pharmacy, setPharmacy] = useState(null);
     const [inventory, setInventory] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pendingOrders, setPendingOrders] = useState([]);
+    const [processingId, setProcessingId] = useState(null);
 
     useEffect(() => {
         if (!state.user?.uid) return;
@@ -28,11 +30,32 @@ export default function PharmacyDashboard() {
         loadProfile();
 
         // Subscribe to inventory changes
-        const unsub = subscribeToInventory(state.user.uid, (items) => {
+        const unsubInv = subscribeToInventory(state.user.uid, (items) => {
             setInventory(items);
         });
-        return () => unsub();
+
+        // Subscribe to incoming orders to show notifications
+        const unsubOrders = subscribeToPharmacyOrders(state.user.uid, (allOrders) => {
+            setPendingOrders(allOrders.filter(o => o.status === 'pending'));
+        });
+
+        return () => {
+            unsubInv();
+            unsubOrders();
+        };
     }, [state.user?.uid]);
+
+    const handleUpdateStatus = async (orderId, newStatus) => {
+        setProcessingId(orderId);
+        try {
+            await updateOrderStatus(orderId, newStatus);
+        } catch (error) {
+            console.error('Failed to update order status:', error);
+            alert('Failed to update order status');
+        } finally {
+            setProcessingId(null);
+        }
+    };
 
     const lowStockItems = inventory.filter(i => i.qty <= (i.lowStockThreshold || 10));
     const today = new Date();
@@ -56,9 +79,35 @@ export default function PharmacyDashboard() {
                         <p className="pd-header-subtitle">Dashboard</p>
                     </div>
                 </div>
-                <div className="pd-header-actions">
-                    <button className="pd-icon-btn" onClick={() => navigate('/pharmacy-requests')}>
+                <div className="pd-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div 
+                        className="pd-location-btn" 
+                        onClick={fetchLocation} 
+                        style={{ 
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', 
+                            background: 'var(--bg-card)', padding: '6px 12px', borderRadius: '20px', 
+                            fontSize: '0.85rem', fontWeight: '500', boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                            border: '1px solid var(--border-color)', color: 'var(--text-color)'
+                        }}
+                    >
+                        <MapPin size={16} color="var(--primary)" />
+                        <span className="loc-text">{state.location.city || state.location.address || 'Detect Location'}</span>
+                        <ChevronDown size={14} color="var(--gray-500)" />
+                    </div>
+                    <button className="pd-icon-btn" style={{ position: 'relative' }} onClick={() => navigate('/pharmacy-orders')}>
                         <Bell size={20} />
+                        {pendingOrders.length > 0 && (
+                            <span style={{
+                                position: 'absolute', top: '0px', right: '0px',
+                                background: 'var(--danger)', color: 'white',
+                                fontSize: '10px', fontWeight: 'bold',
+                                width: '16px', height: '16px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                borderRadius: '50%'
+                            }}>
+                                {pendingOrders.length}
+                            </span>
+                        )}
                     </button>
                 </div>
             </div>
@@ -117,6 +166,51 @@ export default function PharmacyDashboard() {
                     </button>
                 </div>
             </div>
+
+            {/* Notification Alerts for New Orders */}
+            {pendingOrders.length > 0 && (
+                <div className="pd-section">
+                    <h2 className="pd-section-title" style={{ color: 'var(--primary)' }}>🔔 New Order Requests</h2>
+                    <div className="pd-alerts">
+                        {pendingOrders.map(order => (
+                            <div key={order.id} className="pd-alert-card" style={{ background: 'var(--primary-light)', borderColor: 'var(--primary-200)', flexDirection: 'column', alignItems: 'stretch', gap: '12px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div>
+                                        <span className="pd-alert-name" style={{ color: 'var(--primary-dark)' }}>Order #{order.id.slice(-6).toUpperCase()}</span>
+                                        <span className="pd-alert-detail" style={{ fontSize: '13px' }}>From {order.userName} • {order.items?.length} items • <strong>₹{order.total}</strong></span>
+                                        {order.deliveryMode === 'delivery' && (
+                                            <span style={{ display: 'block', fontSize: '11px', color: 'var(--primary)', marginTop: '4px', fontWeight: '500' }}>
+                                                <MapPin size={10} style={{ display: 'inline', marginRight: '4px' }}/> 
+                                                Delivery to {order.deliveryAddress?.city || 'Local'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="pd-alert-badge" style={{ background: 'var(--primary)', color: 'white' }}>New</span>
+                                </div>
+                                
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button 
+                                        className="btn btn-primary btn-sm" 
+                                        style={{ flex: 1 }} 
+                                        onClick={() => handleUpdateStatus(order.id, 'accepted')}
+                                        disabled={processingId === order.id}
+                                    >
+                                        {processingId === order.id ? 'Processing...' : 'Accept Order'}
+                                    </button>
+                                    <button 
+                                        className="btn btn-outline btn-sm" 
+                                        style={{ flex: 1, borderColor: 'var(--danger)', color: 'var(--danger)' }} 
+                                        onClick={() => handleUpdateStatus(order.id, 'rejected')}
+                                        disabled={processingId === order.id}
+                                    >
+                                        {processingId === order.id ? '...' : 'Reject'}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Alerts */}
             {(lowStockItems.length > 0 || expiringItems.length > 0) && (

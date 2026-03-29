@@ -216,9 +216,9 @@ export function AppProvider({ children }) {
     }, [state.cart]);
 
     const getNearbyPharmacies = useCallback(() => {
-        // Return registered Firestore pharmacies within radius
+        // Return registered Firestore pharmacies within radius that have inventory
         return state.registeredPharmacies
-            .filter(p => typeof p.distance === 'number' && p.distance <= state.radius)
+            .filter(p => typeof p.distance === 'number' && p.distance <= state.radius && p.inventory && p.inventory.length > 0)
             .sort((a, b) => a.distance - b.distance);
     }, [state.registeredPharmacies, state.radius]);
 
